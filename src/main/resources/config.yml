@@ -1,0 +1,17 @@
+owner: "Billy"
+twitch-channel: "Thebilibis"
+
+discord:
+  # use discord bot to sync Discord highest role with server groups
+  # Note: "My Super Role" become "my-super-role", use display names to
+  #       change the way the group is displayed
+  enabled: false
+  # Create a discord app on https://discordapp.com/developers/applications
+  # Then paste its bot token here
+  token:
+  # Guild id (Server Settings > Widget > Server ID)
+  server:
+  # command prefix
+  prefix: "!"
+  # color used by the bot in embeds
+  embed-color: 1099597

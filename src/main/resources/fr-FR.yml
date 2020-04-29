@@ -1,0 +1,27 @@
+loaded: "Salut %s ! Enforcer plugin a été activé."
+using-perms: "Le plugin utilise %s pour la gestion des permissions"
+discord:
+  ready: "Bot discord prêt et connecté en tant que %s#%s"
+  new-ip-allowed: "Demande approuvée pour *%s* ! Connecte-toi rapidement."
+  logged-to: "Bot connecté au serveur %s"
+  bot-mentionned: "Hey <@%d> ! Mon prefix est \"%c\""
+  already-associated: ":x: *%s* est déjà associé à <@%d> !"
+  missing-args: ":x: Arguments manquants"
+  available-commands: "Commandes disponibes :"
+  cannot-get-player.title: ":x: Impossible de recupérer le joueur associé à ton compte discord..."
+  cannot-get-player.desc: "As-tu enregistré ton compte minecraft ?"
+  registered: "Ton compte discord a été associé à *%s* !"
+  8=D: "C'est pas très poli tout ça <@%d> !"
+  command-desciption:
+    register: >
+      associe ton compte discord à un compte **Minecraft** pour bénéficier des
+      avantages de ton role Discord sur le server"
+    allow-ip: "Permet d'ajouter une IP supplémentaire au Pare-feu"
+    info: "Affiche cette aide"
+login-denied: >
+  §c§m    ================    §r     §lPare-feu§r     §c§m    ================    §r
+  Vous n'avez pas la possibilité de rejoindre car votre ip n'a pas
+  pu être identifiée.
+
+  §7Connectez-vous au discord et faite la commande §o§f%s§r§7
+  pour autororiser une nouvelle ip

@@ -1,0 +1,10 @@
+players: {}
+#  username:
+#    ip:
+#      - 127.0.0.1
+#    registering-new-ip: false
+#    discord: 000000000000000000
+discord: {}
+#  '000000000000000000':
+#    mc: username
+#    role: Role

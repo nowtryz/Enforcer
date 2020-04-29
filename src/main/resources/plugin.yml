@@ -1,0 +1,13 @@
+name: "Enforcer"
+version: ${project.version}
+description: "Enforces login rules and syncs roles with a Discord server and user status on a Twitch channel"
+author: "Nowtryz"
+website: "http://nowtryz.net"
+
+main: "net.nowtryz.enforcer.Enforcer"
+api-version: "1.13"
+depend:
+  - LuckPerms
+  - Vault
+
+prefix: "Enforcer"
