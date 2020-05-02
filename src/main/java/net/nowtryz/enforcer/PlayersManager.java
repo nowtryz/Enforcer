@@ -7,7 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitScheduler;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +17,7 @@ import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class PlayersManager {
@@ -30,9 +31,9 @@ public class PlayersManager {
         this.plugin = plugin;
         this.playersFile = new File(plugin.getDataFolder(), "players.yml");
 
-        try {
-            playersFile.createNewFile();
-            final InputStream defConfigStream = this.plugin.getResource("players.yml");
+        try (final InputStream defConfigStream = this.plugin.getResource("players.yml")) {
+            assert defConfigStream != null;
+            if (playersFile.createNewFile()) plugin.getLogger().info("Created a new player file");
             this.config = YamlConfiguration.loadConfiguration(playersFile);
             this.config.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charsets.UTF_8)));
             this.players = this.config.getConfigurationSection("players");
@@ -52,6 +53,15 @@ public class PlayersManager {
         return new PlayerInfo(playerName, section, this);
     }
 
+    public Optional<PlayerInfo> getPlayerInfo(UUID uuid) {
+        return Optional.ofNullable(Bukkit.getServer().getPlayer(uuid))
+                .map(Player::getName)
+                .map(playerName -> {
+            ConfigurationSection section = this.getPlayerSection(playerName);
+            return new PlayerInfo(playerName, section, this);
+        });
+    }
+
     public Optional<PlayerInfo> getPlayerFromDiscord(Snowflake userId) {
         ConfigurationSection section = this.discord.getConfigurationSection(userId.asString());
 
@@ -69,6 +79,7 @@ public class PlayersManager {
         ConfigurationSection discordSection = this.discord.getConfigurationSection(userId.asString());
         if (discordSection != null) {
             String mc = discordSection.getString("mc");
+            assert mc != null;
             ConfigurationSection oldMc = this.players.getConfigurationSection(mc);
             assert oldMc != null;
             oldMc.set("discord", null);
@@ -81,10 +92,9 @@ public class PlayersManager {
         discordSection.set("role", null);
     }
 
-
-
     public ConfigurationSection getPlayerDiscordSection(String playerName) {
         String discordId =  this.getPlayerSection(playerName).getString("discord");
+        assert discordId != null;
         return this.discord.getConfigurationSection(discordId);
     }
 
@@ -111,7 +121,7 @@ public class PlayersManager {
         this.save();
     }
 
-    public void save() {
+    public synchronized void save() {
         try {
             this.config.save(this.playersFile);
         } catch (IOException e) {
@@ -125,7 +135,7 @@ public class PlayersManager {
         private final String playerName;
         private Snowflake discordId;
 
-        PlayerInfo(String playerName, ConfigurationSection playerSection, PlayersManager manager) {
+        PlayerInfo(@NotNull String playerName, @NotNull ConfigurationSection playerSection, @NotNull PlayersManager manager) {
             this.manager = manager;
             this.playerName = playerName;
             this.playerSection = playerSection;

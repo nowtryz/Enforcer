@@ -1,17 +1,62 @@
-owner: "Billy"
-twitch-channel: "Thebilibis"
+#################################
+##   Enforcer configurations   ##
+#################################
 
+# Used when the plugin is enabled to test if the config was loaded correctly
+owner: "Billy"
+
+
+# Firewall is a more convenient way than passwords to ensure that cracked users don't steal accounts.
+# It will check the IPs of players and disallow clients that use another IP than ones saved for a
+# specific player.
+# To add a new entry to it IP list, the player need to use "newip" command on the discord and then
+# connect to the server from another place. (no need for the player to know its IP)
+firewall:
+  enabled: false
+
+
+# use discord bot to sync Discord highest role with server groups
+# Note: "My Super Role" become "my-super-role", use display names to
+#       change the way the group is displayed in your permission
+#       plugin.
 discord:
-  # use discord bot to sync Discord highest role with server groups
-  # Note: "My Super Role" become "my-super-role", use display names to
-  #       change the way the group is displayed
+  # Launch the bot on plugin startup
   enabled: false
   # Create a discord app on https://discordapp.com/developers/applications
   # Then paste its bot token here
   token:
   # Guild id (Server Settings > Widget > Server ID)
+  # The bot will only listen messages and role updates from this server
   server:
-  # command prefix
+  # command prefix, change it if it interfere with another bot
   prefix: "!"
   # color used by the bot in embeds
   embed-color: 1099597
+
+
+# use twitch bot to sync twitch community status (Followers / Subs) with server groups
+twitch:
+  # Launch the bot on plugin startup
+  enabled: false
+  channel: "Thebilibis"
+  token:
+  # command prefix, change it if it interfere with another bot
+  prefix: "!"
+
+  # Settings for subs
+  sub:
+    # Should the bot synchronize subs ?
+    sync: true
+    # The group to put subs in
+    group: sub
+    # Should sub be added to whitelist ?
+    white-list: false
+
+  # Settings for followers
+  follower:
+    # Should the bot synchronize followers ?
+    sync: true
+    # The group to put followers in
+    group: follower
+    # Should followers be added to whitelist ?
+    white-list: false

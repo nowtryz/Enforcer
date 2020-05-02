@@ -1,6 +1,7 @@
 # Enforcer
 
 When finished, this plugin will:
+ - A firewall to prevent crack users to steal an account
  - Sync one Discord server's roles with group for all users
  - Assign different groups for twitch subs and followers
 
@@ -12,7 +13,8 @@ These instructions will get you a copy of the project up and running on your loc
 
  - Maven installed
  - A Spigot server (or Bukkit/Paper either)
- - Vault
+ - Have the [Vault](https://dev.bukkit.org/projects/vault) plugin in your plugin folder
+ - An app and a Bot created on [Discord Dev Portal](https://discordapp.com/developers/applications)
 
 ### Installing
 
@@ -20,10 +22,11 @@ These instructions will get you a copy of the project up and running on your loc
     ```
     mvn clean install
     ```
-1. Put it in your plugin folder
+1. Put the resulting JAR available in `target/Enforcer-VERSION-SNAPSHOT.jar` in your plugin folder
 1. Create an App and a Bot on [Discord Dev Portal](https://discordapp.com/developers/applications)
 1. Run the server
 1. Edit `plugins/Enforcer/config.yml`
+1. Run `enforcer reload` in the console
 
 ## Built With
 
@@ -41,8 +44,6 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 ## Authors
 
 * **Damien Djmb** - *Initial work* - [Nowtryz](https://github.com/Nowtryz)
-
-See also the list of [contributors](https://github.com/nowtryz/Enforcer/contributors) who participated in this project.
 
 ## License
 

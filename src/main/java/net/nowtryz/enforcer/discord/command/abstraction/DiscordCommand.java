@@ -1,10 +1,10 @@
-package net.nowtryz.enforcer.discord.command;
+package net.nowtryz.enforcer.discord.command.abstraction;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
 
-interface DiscordCommand {
-    void execute(MessageCreateEvent event, String[] args);
+public interface DiscordCommand {
+    void execute(User bot, MessageCreateEvent event, String[] args);
     String getCommand();
     String getDescription();
     String getUsage();

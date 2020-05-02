@@ -3,28 +3,39 @@ package net.nowtryz.enforcer;
 import com.google.common.base.Charsets;
 import net.milkbowl.vault.permission.Permission;
 import net.nowtryz.enforcer.discord.DiscordBot;
+import net.nowtryz.enforcer.listeners.FirewallListener;
+import net.nowtryz.enforcer.provider.ConfigProvider;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 
 public final class Enforcer extends JavaPlugin {
     private FileConfiguration lang;
     private Permission vaultPermission;
     private PlayersManager playersManager;
-    private Optional<DiscordBot> discordBot = Optional.empty();
+    private DiscordBot discordBot = null;
+    private final CountDownLatch enableLatch = new CountDownLatch(1);
+    private ConfigProvider provider;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         super.saveDefaultConfig();
+        this.provider = new ConfigProvider(this);
 
         // load language file
         InputStream langStream = getResource("fr-FR.yml");
@@ -35,28 +46,50 @@ public final class Enforcer extends JavaPlugin {
         this.playersManager = new PlayersManager(this);
 
         // Bots
-        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-            this.discordBot = Optional.of(new DiscordBot(this));
-            this.discordBot.ifPresent(DiscordBot::block);
+        if (this.provider.discord.isEnabled()) Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            this.getLogger().info("Starting discord bot");
+            this.discordBot = new DiscordBot(this);
+            this.discordBot.block();
         });
 
         // Vault API
-         this.vaultPermission = getServer().getServicesManager().getRegistration(Permission.class).getProvider();
+         this.vaultPermission = Objects.requireNonNull(
+                 Bukkit.getServicesManager().getRegistration(Permission.class),
+                 "Cannot find a permission system"
+         ).getProvider();
          this.getLogger().info(this.translate("using-perms", this.vaultPermission.getName()));
 
-        // Listener
-        this.getServer().getPluginManager().registerEvents(new JoinListener(this, this.playersManager), this);
+        // Firewall
+        if (!this.getServer().getOnlineMode() && this.provider.isFirewallEnabled()) {
+            this.getLogger().info("Enabling firewall");
+            Bukkit.getPluginManager().registerEvents(new FirewallListener(this), this);
+        }
 
         // enabled
-        this.getLogger().log(Level.INFO, this.translate("loaded", this.getConfig().getString("owner")));
+        this.getLogger().log(Level.INFO, this.translate("loaded", this.provider.getOwner()));
+        this.enableLatch.countDown();
     }
 
     @Override
     public void onDisable() {
+        HandlerList.unregisterAll(this);
+        Optional.ofNullable(this.discordBot).ifPresent(DiscordBot::disable);
+        this.discordBot = null;
+
         this.playersManager.save();
         this.playersManager = null;
-        this.discordBot.ifPresent(DiscordBot::onDisable);
-        this.discordBot = Optional.empty();
+    }
+
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (label.equals("enforcer") && sender.hasPermission("enforcer.reload")) {
+            Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+                this.onDisable();
+                this.reloadConfig();
+                this.onEnable();
+            });
+        }
+        return true;
     }
 
     /**
@@ -77,7 +110,7 @@ public final class Enforcer extends JavaPlugin {
      * @return the discord bot
      */
     public Optional<DiscordBot> getDiscordBot() {
-        return discordBot;
+        return Optional.ofNullable(this.discordBot);
     }
 
     /**
@@ -96,15 +129,19 @@ public final class Enforcer extends JavaPlugin {
         return playersManager;
     }
 
+    public CountDownLatch getEnableLatch() {
+        return enableLatch;
+    }
+
+    public ConfigProvider getProvider() {
+        return provider;
+    }
+
     /**
      * Translate the given key using the language file
      * @param key the key to get from the language file
      * @param args variable to use in the string formatter
      * @return the formatted translated string
-
-    public Optional<DiscordBot> getDiscordBot() {
-        return discordBot;
-    }
      */
     public String translate(String key, Object... args) {
         Validate.notNull(key, "key is missing");

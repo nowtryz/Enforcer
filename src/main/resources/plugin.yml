@@ -11,3 +11,9 @@ depend:
   - Vault
 
 prefix: "Enforcer"
+
+commands:
+  enforcer:
+    description: reload enforcer configurations
+    permission: enforcer.reload
+    usage: /enforcer
