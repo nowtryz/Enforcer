@@ -7,6 +7,7 @@ public class TwitchConfigProvider {
     private final ConfigurationSection section;
     private final boolean enabled;
     private final String channel;
+    private final String user;
     private final String token;
     private final char prefix;
     private final boolean subSync;
@@ -26,7 +27,8 @@ public class TwitchConfigProvider {
 
         //affectations
         this.enabled = section.getBoolean("enabled", false);
-        this.channel = section.getString("channel");
+        this.channel = toLower(section.getString("channel"));
+        this.user = section.getString("user");
         this.token = section.getString("token");
         this.prefix = prefixField.charAt(0);
         this.subSync = section.getBoolean("sub.sync", false);
@@ -44,6 +46,11 @@ public class TwitchConfigProvider {
         }
     }
 
+    private String toLower(String str) {
+        if (str == null) return  null;
+        return str.toLowerCase();
+    }
+
     public ConfigurationSection getSection() {
         return section;
     }
@@ -54,6 +61,10 @@ public class TwitchConfigProvider {
 
     public String getChannel() {
         return channel;
+    }
+
+    public String getUser() {
+        return user;
     }
 
     public String getToken() {

@@ -19,6 +19,11 @@ public class AllowIpCommand extends AbstractDiscordCommand implements UseFooterC
     }
 
     @Override
+    public boolean isEnabled() {
+        return this.getProvider().isFirewallEnabled();
+    }
+
+    @Override
     public String getDescriptionKey() {
         return "allow-ip";
     }

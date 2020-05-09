@@ -8,23 +8,32 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.presence.Activity;
+import discord4j.core.object.presence.Presence;
 import net.nowtryz.enforcer.Enforcer;
 import net.nowtryz.enforcer.abstraction.PluginHolder;
 import net.nowtryz.enforcer.discord.command.abstraction.DiscordCommand;
+import net.nowtryz.enforcer.tps.TPS;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitTask;
 import reactor.core.publisher.Mono;
 
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 
 public abstract class AbstractDiscordBot implements Listener, PluginHolder {
+    private static final DecimalFormat tbsFormatter = new DecimalFormat("#.##");
+    private BukkitTask bukkitTask;
+
     protected final Enforcer plugin;
     protected final DiscordClient client;
     protected User user;
+
 
     public AbstractDiscordBot(Enforcer plugin) {
 
@@ -45,6 +54,10 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
 
     public final void register() {
         Bukkit.getPluginManager().registerEvents(this, this.plugin);
+
+        if (this.getDiscordProvider().doesUpdatePresence()) {
+            this.bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, this::updatePresence, 0, 1200);
+        }
     }
 
     public final void onReady(ReadyEvent event) {
@@ -104,6 +117,15 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
         }));
     }
 
+    protected void updatePresence() {
+        this.client.updatePresence(Presence.online(Activity.playing(this.translate(
+                "discord.presence",
+                tbsFormatter.format(TPS.getTPS()),
+                Bukkit.getServer().getOnlinePlayers().size(),
+                Bukkit.getServer().getMaxPlayers()
+        )))).block();
+    }
+
     private boolean isBotMentioned(Message message) {
         return message.getUserMentionIds().contains(this.user.getId());
     }
@@ -135,6 +157,7 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
     protected abstract Map<String, DiscordCommand> getCommandMap();
 
     public void disable() {
+        this.bukkitTask.cancel();
         this.client.logout().block();
     }
 }

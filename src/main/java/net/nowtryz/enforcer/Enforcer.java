@@ -5,6 +5,7 @@ import net.milkbowl.vault.permission.Permission;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.listeners.FirewallListener;
 import net.nowtryz.enforcer.provider.ConfigProvider;
+import net.nowtryz.enforcer.twitch.TwitchBot;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -28,6 +29,7 @@ public final class Enforcer extends JavaPlugin {
     private Permission vaultPermission;
     private PlayersManager playersManager;
     private DiscordBot discordBot = null;
+    private TwitchBot twitchBot = null;
     private final CountDownLatch enableLatch = new CountDownLatch(1);
     private ConfigProvider provider;
 
@@ -36,20 +38,26 @@ public final class Enforcer extends JavaPlugin {
         // Plugin startup logic
         super.saveDefaultConfig();
         this.provider = new ConfigProvider(this);
+        this.playersManager = new PlayersManager(this);
 
         // load language file
         InputStream langStream = getResource("fr-FR.yml");
         Validate.notNull(langStream, "Unable to find language file");
         this.lang = YamlConfiguration.loadConfiguration(new InputStreamReader(langStream, Charsets.UTF_8));
 
-        // players manager
-        this.playersManager = new PlayersManager(this);
-
         // Bots
         if (this.provider.discord.isEnabled()) Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             this.getLogger().info("Starting discord bot");
             this.discordBot = new DiscordBot(this);
             this.discordBot.block();
+        });
+        if (this.provider.twitch.isEnabled()) Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            this.getLogger().info("Starting twitch bot");
+            try {
+                this.twitchBot = new TwitchBot(this);
+            } catch (Exception e) {
+                this.getLogger().log(Level.SEVERE, "Unable to launch twitch bot: %s", e.getMessage());
+            }
         });
 
         // Vault API
@@ -73,10 +81,12 @@ public final class Enforcer extends JavaPlugin {
     @Override
     public void onDisable() {
         HandlerList.unregisterAll(this);
+        Optional.ofNullable(this.twitchBot).ifPresent(TwitchBot::disable);
         Optional.ofNullable(this.discordBot).ifPresent(DiscordBot::disable);
-        this.discordBot = null;
+        Optional.ofNullable(this.playersManager).ifPresent(PlayersManager::save);
 
-        this.playersManager.save();
+        this.discordBot = null;
+        this.twitchBot = null;
         this.playersManager = null;
     }
 

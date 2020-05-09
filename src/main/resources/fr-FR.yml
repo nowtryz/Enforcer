@@ -1,6 +1,7 @@
 loaded: "Salut %s ! Enforcer plugin a été activé."
 using-perms: "Le plugin utilise %s pour la gestion des permissions"
 discord:
+  presence: "Minecraft | TPS : %s | %d / %d"
   ready: "Bot discord prêt et connecté en tant que %s#%s"
   new-ip-allowed: "Demande approuvée pour *%s* ! Connecte-toi rapidement."
   logged-to: "Bot connecté au serveur %s"
@@ -19,6 +20,10 @@ discord:
       avantages de ton role Discord sur le server"
     allow-ip: "Permet d'ajouter une IP supplémentaire au Pare-feu"
     info: "Affiche cette aide"
+twitch:
+  missing-args: "/me : Arguments manquants ! usage : %s"
+  already-associated: "/me : %s est déjà associé à %s !"
+  registered: "/me : %s, ton compte twitch a été associé à %s !"
 login-denied: >
   §c§m    ================    §r     §lPare-feu§r     §c§m    ================    §r
   Vous n'avez pas la possibilité de rejoindre car votre ip n'a pas

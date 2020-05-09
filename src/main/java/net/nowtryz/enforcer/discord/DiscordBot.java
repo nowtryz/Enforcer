@@ -62,11 +62,17 @@ public class DiscordBot extends AbstractDiscordBot {
         try {
             this.plugin.getEnableLatch().await(30, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            this.getLogger().severe(e.getMessage());
+            return;
         }
 
+        // fixme event not triggered
         this.plugin.getPlayersManager()
                 .getPlayerInfo(event.getUniqueId())
+                .map(p -> {
+                    System.out.println("got player info");
+                    return p;
+                })
                 .ifPresent(this::grabRole);
     }
 

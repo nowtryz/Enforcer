@@ -12,6 +12,7 @@ public class DiscordConfigProvider {
     private final int embedColor;
     private final boolean enabled;
     private final String token;
+    private final boolean presence;
 
 
     DiscordConfigProvider(@Nullable ConfigurationSection section) {
@@ -28,6 +29,7 @@ public class DiscordConfigProvider {
         this.guild = Snowflake.of(section.getLong("server"));
         this.prefix = prefixField.charAt(0);
         this.embedColor = section.getInt("embed-color", 14528782);
+        this.presence = section.getBoolean("presense", true);
 
         //Validations
         if (this.enabled) {
@@ -36,27 +38,11 @@ public class DiscordConfigProvider {
         }
     }
 
-    public ConfigurationSection getSection() {
-        return section;
-    }
-
-    public Snowflake getGuild() {
-        return guild;
-    }
-
-    public char getPrefix() {
-        return prefix;
-    }
-
-    public int getEmbedColor() {
-        return embedColor;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public String getToken() {
-        return token;
-    }
+    public ConfigurationSection getSection() { return section; }
+    public Snowflake getGuild() { return guild; }
+    public char getPrefix() { return prefix; }
+    public int getEmbedColor() { return embedColor; }
+    public boolean isEnabled() { return enabled; }
+    public String getToken() { return token; }
+    public boolean doesUpdatePresence() { return presence; }
 }

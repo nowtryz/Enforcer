@@ -6,7 +6,7 @@
 
     <groupId>net.nowtryz</groupId>
     <artifactId>Enforcer</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Enforcer Plugin</name>
@@ -14,6 +14,7 @@
     <description>Enforces login rules and syncs roles with a Discord server and user status on a Twitch channel
     </description>
     <properties>
+        <netty.version>4.1.48.Final</netty.version>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -40,18 +41,47 @@
                         <excludes>
                             <exclude>module-info.java</exclude>
                         </excludes>
+                        <includes>
+                            <include>*:*</include>
+                        </includes>
                     </artifactSet>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
+<!--                    <shadedArtifactAttached>true</shadedArtifactAttached>-->
+                    <minimizeJar>true</minimizeJar>
                     <relocations>
+                        <!-- Relocation du to NMS dependency overlap -->
                         <relocation>
                             <pattern>io.netty</pattern>
-                            <shadedPattern>net.nowtryz.shaded.io.netty</shadedPattern>
+                            <shadedPattern>net.nowtryz.shaded.netty</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>org.apache</pattern>
+                            <shadedPattern>net.nowtryz.shaded.apache</shadedPattern>
+                        </relocation>
+                        <!-- Relocation to protect other bots -->
+                        <relocation>
                             <pattern>discord4j</pattern>
-                            <shadedPattern>shaded.discord4j</shadedPattern>
+                            <shadedPattern>enforcer.discord4j</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.discord4j</pattern>
+                            <shadedPattern>enforcer.discord4j</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.reactivestreams</pattern>
+                            <shadedPattern>net.nowtryz.shaded.reactivestreams</shadedPattern>
                         </relocation>
                     </relocations>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                 </configuration>
                 <executions>
                     <execution>
@@ -87,6 +117,30 @@
         </repository>
     </repositories>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- Prevent IRC from using another version of netty -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec</artifactId>
+                <version>${netty.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-handler</artifactId>
+                <version>${netty.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-handler-proxy</artifactId>
+                <version>${netty.version}</version>
+                <scope>compile</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
@@ -116,9 +170,9 @@
             <version>3.0.14</version>
         </dependency>
         <dependency>
-            <groupId>pircbot</groupId>
-            <artifactId>pircbot</artifactId>
-            <version>1.5.0</version>
+            <groupId>org.kitteh.irc</groupId>
+            <artifactId>client-lib</artifactId>
+            <version>7.2.2</version>
         </dependency>
     </dependencies>
 </project>

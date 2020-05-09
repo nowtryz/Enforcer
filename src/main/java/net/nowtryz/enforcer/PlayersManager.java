@@ -23,10 +23,15 @@ import java.util.logging.Level;
 public class PlayersManager {
     private final File playersFile;
     private FileConfiguration config;
-    private ConfigurationSection players, discord;
+    private ConfigurationSection players, discord, twitch;
     private Enforcer plugin;
 
 
+    /**
+     * Instantiate a manager to manipulate the player information<br>
+     *     File implementation
+     * @param plugin the instance of the enforcer plugin
+     */
     public PlayersManager(Enforcer plugin) {
         this.plugin = plugin;
         this.playersFile = new File(plugin.getDataFolder(), "players.yml");
@@ -38,6 +43,7 @@ public class PlayersManager {
             this.config.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charsets.UTF_8)));
             this.players = this.config.getConfigurationSection("players");
             this.discord = this.config.getConfigurationSection("discord");
+            this.twitch = this.config.getConfigurationSection("twitch");
         } catch (IOException e) {
             this.plugin.getLogger().log(Level.SEVERE, "Unable to load players data");
         }
@@ -48,12 +54,21 @@ public class PlayersManager {
         else return players.getConfigurationSection(playerName);
     }
 
+    /**
+     * Retrieve player information from its name
+     * @param playerName the username of the player
+     * @return the player information
+     * @deprecated use UUID instead
+     */
+    @Deprecated
     public PlayerInfo getPlayerInfo(String playerName) {
         ConfigurationSection section = this.getPlayerSection(playerName);
         return new PlayerInfo(playerName, section, this);
     }
 
     public Optional<PlayerInfo> getPlayerInfo(UUID uuid) {
+        System.out.println(uuid);
+        System.out.println(Bukkit.getServer().getPlayer(uuid));
         return Optional.ofNullable(Bukkit.getServer().getPlayer(uuid))
                 .map(Player::getName)
                 .map(playerName -> {
@@ -92,6 +107,25 @@ public class PlayersManager {
         discordSection.set("role", null);
     }
 
+    private void registerTwitchAccount(String twitchUser, String playerName, ConfigurationSection playerSection) {
+        // clear old association
+        ConfigurationSection twitchSection = this.discord.getConfigurationSection(twitchUser);
+        if (twitchSection != null) {
+            String mc = twitchSection.getString("mc");
+            assert mc != null;
+            ConfigurationSection oldMc = this.players.getConfigurationSection(mc);
+            assert oldMc != null;
+            oldMc.set("twitch", null);
+        } else {
+            twitchSection = this.discord.createSection(twitchUser);
+        }
+
+        playerSection.set("twitch", twitchUser);
+        twitchSection.set("mc", playerName);
+        twitchSection.set("follow", false);
+        twitchSection.set("sub", false);
+    }
+
     public ConfigurationSection getPlayerDiscordSection(String playerName) {
         String discordId =  this.getPlayerSection(playerName).getString("discord");
         assert discordId != null;
@@ -104,13 +138,14 @@ public class PlayersManager {
         section.set("ip", new LinkedList<String>());
         section.set("registering-new-ip", true);
         section.set("discord", null);
+        section.set("twitch", null);
         this.save();
 
         return section;
     }
 
-    private void allowNewIp(ConfigurationSection playerSection) {
-        playerSection.set("registering-new-ip", true);
+    private void allowNewIp(ConfigurationSection playerSection, boolean doAllow) {
+        playerSection.set("registering-new-ip", doAllow);
     }
 
     private void registerNewIp(InetAddress ip, ConfigurationSection section) {
@@ -134,6 +169,7 @@ public class PlayersManager {
         private final PlayersManager manager;
         private final String playerName;
         private Snowflake discordId;
+        private String twitchUsername;
 
         PlayerInfo(@NotNull String playerName, @NotNull ConfigurationSection playerSection, @NotNull PlayersManager manager) {
             this.manager = manager;
@@ -143,12 +179,14 @@ public class PlayersManager {
         }
 
         public void hydrate() {
+            this.twitchUsername = playerSection.getString("twitch");
             String discordIdStr = playerSection.getString("discord");
 
             if (discordIdStr != null && Long.parseLong(discordIdStr) != 0) {
                 this.discordId = Snowflake.of(discordIdStr);
                 this.discordSection = this.manager.discord.getConfigurationSection(discordIdStr);
             }
+
         }
 
         public String getPlayerName() {
@@ -172,12 +210,20 @@ public class PlayersManager {
             else return Optional.empty();
         }
 
+        public Optional<String> getTwitchUsername() {
+            return Optional.ofNullable(this.twitchUsername);
+        }
+
         public Optional<Player> getPlayer() {
             return Optional.ofNullable(Bukkit.getServer().getPlayer(playerName));
         }
 
+        public void allowNewIp(boolean doAllow) {
+            this.manager.allowNewIp(this.playerSection, doAllow);
+        }
+
         public void allowNewIp() {
-            this.manager.allowNewIp(this.playerSection);
+            this.allowNewIp(true);
         }
 
         public void newIp(InetAddress ip) {
@@ -192,6 +238,11 @@ public class PlayersManager {
 
         public void setDiscordRole(String role) {
             Optional.ofNullable(this.discordSection).ifPresent(section -> section.set("role", role));
+            Bukkit.getScheduler().runTaskAsynchronously(this.manager.plugin, this.manager::save);
+        }
+
+        public void setTwitchUsername(String username) {
+            this.manager.registerTwitchAccount(username, this.playerName, this.playerSection);
             Bukkit.getScheduler().runTaskAsynchronously(this.manager.plugin, this.manager::save);
         }
     }

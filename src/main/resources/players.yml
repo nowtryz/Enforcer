@@ -1,10 +1,19 @@
-players: {}
-#  username:
+# players:
+#  uuid:
 #    ip:
 #      - 127.0.0.1
 #    registering-new-ip: false
 #    discord: 000000000000000000
-discord: {}
+#    twitch: twitchUsername
+# discord:
 #  '000000000000000000':
-#    mc: username
+#    mc: uuid
 #    role: Role
+# twitch:
+#   twitchUsername:
+#     mc: username
+#     follow: false
+#     sub: false
+players: {}
+discord: {}
+twitch: {}

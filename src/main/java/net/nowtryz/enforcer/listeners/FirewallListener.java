@@ -35,5 +35,7 @@ public class FirewallListener implements Listener {
                     this.plugin.getConfig().getString("discord.prefix") + DiscordBot.NEW_IP
             ));
         }
+
+        playerInfo.allowNewIp(false);
     }
 }

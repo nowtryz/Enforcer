@@ -32,13 +32,21 @@ discord:
   prefix: "!"
   # color used by the bot in embeds
   embed-color: 1099597
+  # Update bot's presence with TPS and player count (not recommended on bungeecord-like networks)
+  presense: true
 
 
 # use twitch bot to sync twitch community status (Followers / Subs) with server groups
 twitch:
   # Launch the bot on plugin startup
   enabled: false
-  channel: "Thebilibis"
+  # The channel to listen
+  channel:
+  # The user the bot will use
+  user:
+  # An OAuth token for the user. Generate this with https://twitchapps.com/tmi/ (a Twitch
+  # community-driven wrapper around the Twitch API)
+  # Note: the token must begin with "oauth:"
   token:
   # command prefix, change it if it interfere with another bot
   prefix: "!"
