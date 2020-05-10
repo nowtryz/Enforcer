@@ -2,7 +2,7 @@ package net.nowtryz.enforcer.twitch;
 
 import net.engio.mbassy.listener.Handler;
 import net.nowtryz.enforcer.Enforcer;
-import net.nowtryz.enforcer.PlayersManager.PlayerInfo;
+import net.nowtryz.enforcer.playermanager.PlayerInfo;
 import net.nowtryz.enforcer.abstraction.PluginHolder;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.element.Channel;
@@ -10,8 +10,6 @@ import org.kitteh.irc.client.library.event.channel.ChannelJoinEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.kitteh.irc.client.library.event.helper.ConnectionEvent;
 import org.kitteh.irc.client.library.feature.twitch.TwitchSupport;
-
-import java.util.Date;
 
 public class TwitchBot implements PluginHolder {
     public static final String REGISTER = "mc";

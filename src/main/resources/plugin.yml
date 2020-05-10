@@ -14,6 +14,26 @@ prefix: "Enforcer"
 
 commands:
   enforcer:
-    description: reload enforcer configurations
+    description: show enforcer help
+    usage: /<command> reload|clear
+  enforcer reload:
+    description: reload enforcer configurations and restar bots
     permission: enforcer.reload
-    usage: /enforcer
+    usage: /<command> reload
+  enforcer clear:
+    description: clear all players data
+    permission: enforcer.clear
+    usage: /<command> clear
+
+permissions:
+  enforcer.*:
+    description: Give acces to all enforcer commands
+    children:
+      enforcer.reload: true
+      enforcer.reset: true
+  enforcer.reload:
+    description: Allows to use /enforcer reload command
+    default: op
+  enforcer.clear:
+    description: Allows to use /enforcer clear command
+    default: op

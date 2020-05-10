@@ -1,7 +1,7 @@
 package net.nowtryz.enforcer.listeners;
 
 import net.nowtryz.enforcer.Enforcer;
-import net.nowtryz.enforcer.PlayersManager.PlayerInfo;
+import net.nowtryz.enforcer.playermanager.PlayerInfo;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

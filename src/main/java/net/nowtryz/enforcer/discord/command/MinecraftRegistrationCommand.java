@@ -4,7 +4,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import net.nowtryz.enforcer.Enforcer;
-import net.nowtryz.enforcer.PlayersManager.PlayerInfo;
+import net.nowtryz.enforcer.playermanager.PlayerInfo;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.discord.command.abstraction.AbstractDiscordCommand;
 import net.nowtryz.enforcer.discord.command.abstraction.UseArgumentsCommand;
@@ -32,10 +32,7 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
     @Override
     public void execute(User bot, MessageCreateEvent event, String[] args) {
         Message message = event.getMessage();
-        message.getAuthor().ifPresent(author -> this.registerUser(bot, author, message, args));
-    }
 
-    private void registerUser(User bot, User author, Message message, String[] args) {
         if (args.length != 2) {
             message.getChannel()
                     .blockOptional()
@@ -43,6 +40,10 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
             return;
         }
 
+        message.getAuthor().ifPresent(author -> this.registerUser(bot, author, message, args));
+    }
+
+    private void registerUser(User bot, User author, Message message, String[] args) {
         String username = args[1];
         PlayerInfo playerInfo = this.getPlayersManager().getPlayerInfo(username);
 

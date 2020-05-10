@@ -1,5 +1,13 @@
 loaded: "Salut %s ! Enforcer plugin a été activé."
 using-perms: "Le plugin utilise %s pour la gestion des permissions"
+group-added: "§7Vous avez été ajouté au groupe §6§l%s§r§7."
+help: >
+  §9Aide §dEnforcer§9: /enforcer <commande>
+
+  §7> §9reload§7 : recharge le plugin et relance tous les bots
+
+  §7> §9clear§7  : supprime les données de tous les joueurs
+cleared: "§ddEnforcer : §7Toutes les données ont été effacées"
 discord:
   presence: "Minecraft | TPS : %s | %d / %d"
   ready: "Bot discord prêt et connecté en tant que %s#%s"

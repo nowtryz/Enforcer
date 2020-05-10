@@ -4,10 +4,14 @@ import com.google.common.base.Charsets;
 import net.milkbowl.vault.permission.Permission;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.listeners.FirewallListener;
+import net.nowtryz.enforcer.playermanager.AbstractPlayersManager;
+import net.nowtryz.enforcer.playermanager.FilePlayersManager;
+import net.nowtryz.enforcer.playermanager.PlayersManager;
 import net.nowtryz.enforcer.provider.ConfigProvider;
 import net.nowtryz.enforcer.twitch.TwitchBot;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -19,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
@@ -38,7 +43,7 @@ public final class Enforcer extends JavaPlugin {
         // Plugin startup logic
         super.saveDefaultConfig();
         this.provider = new ConfigProvider(this);
-        this.playersManager = new PlayersManager(this);
+        this.playersManager = new FilePlayersManager(this);
 
         // load language file
         InputStream langStream = getResource("fr-FR.yml");
@@ -92,14 +97,25 @@ public final class Enforcer extends JavaPlugin {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (label.equals("enforcer") && sender.hasPermission("enforcer.reload")) {
-            Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-                this.onDisable();
-                this.reloadConfig();
-                this.onEnable();
-            });
+        if (args.length == 0) {
+            Arrays.stream(this.translate("help").split("\n")).forEach(sender::sendMessage);
+            return true;
         }
-        return true;
+        else if (args[0].equals("reload")) {
+            if (label.equals("enforcer") && sender.hasPermission("enforcer.reload")) {
+                Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+                    this.onDisable();
+                    this.reloadConfig();
+                    this.onEnable();
+                });
+                return true;
+            }
+        } else if (args[0].equals("clear")) {
+            Bukkit.getScheduler().runTaskAsynchronously(this, this.playersManager::clear);
+            sender.sendMessage(this.translate("cleared"));
+            return true;
+        }
+        return false;
     }
 
     /**

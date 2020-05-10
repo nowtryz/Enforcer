@@ -24,6 +24,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 
 public abstract class AbstractDiscordBot implements Listener, PluginHolder {
@@ -157,7 +158,7 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
     protected abstract Map<String, DiscordCommand> getCommandMap();
 
     public void disable() {
-        this.bukkitTask.cancel();
+        Optional.ofNullable(this.bukkitTask).ifPresent(BukkitTask::cancel);
         this.client.logout().block();
     }
 }

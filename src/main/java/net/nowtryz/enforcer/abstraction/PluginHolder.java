@@ -2,7 +2,7 @@ package net.nowtryz.enforcer.abstraction;
 
 import net.milkbowl.vault.permission.Permission;
 import net.nowtryz.enforcer.Enforcer;
-import net.nowtryz.enforcer.PlayersManager;
+import net.nowtryz.enforcer.playermanager.PlayersManager;
 import net.nowtryz.enforcer.provider.ConfigProvider;
 import net.nowtryz.enforcer.provider.DiscordConfigProvider;
 import net.nowtryz.enforcer.provider.TwitchConfigProvider;

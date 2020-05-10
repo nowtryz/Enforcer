@@ -5,7 +5,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import net.nowtryz.enforcer.Enforcer;
-import net.nowtryz.enforcer.PlayersManager.PlayerInfo;
+import net.nowtryz.enforcer.playermanager.PlayerInfo;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.discord.command.abstraction.AbstractDiscordCommand;
 import net.nowtryz.enforcer.discord.command.abstraction.UseFooterCommand;
@@ -43,7 +43,7 @@ public class AllowIpCommand extends AbstractDiscordCommand implements UseFooterC
     }
 
     private void allowNewIp(PlayerInfo playerInfo, MessageChannel channel, User bot, User author) {
-        String username = playerInfo.getPlayerName();
+        String username = playerInfo.getPlayer().getName();
         playerInfo.allowNewIp();
         channel.createEmbed(embedCreateSpec -> {
             this.createFooter(bot, embedCreateSpec);
