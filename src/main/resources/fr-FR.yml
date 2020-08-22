@@ -15,10 +15,10 @@ discord:
   ready: "Bot discord prêt et connecté en tant que %s#%s"
   new-ip-allowed: "Demande approuvée pour *%s* ! Connecte-toi rapidement."
   logged-to: "Bot connecté au serveur %s"
-  bot-mentioned: "Hey %s ! Mon prefix est \"%c\""
+  bot-mentioned: "Hey %s ! Mon prefix est `%c`"
   already-associated: ":x: *%s* est déjà associé à %s !"
   missing-args: ":x: Arguments manquants"
-  footer: "Faites '%s' pour la liste des commandes"
+  footer: "Faites `%s` pour la liste des commandes"
   available-commands: "Commandes disponibes :"
   cannot-get-player:
     title: ":x: Impossible de recupérer le joueur associé à ton compte discord..."

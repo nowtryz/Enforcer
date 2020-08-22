@@ -148,7 +148,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.15.2-R0.1-SNAPSHOT</version>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- Plugin dependencies -->
@@ -186,6 +186,11 @@
             <groupId>org.kitteh.irc</groupId>
             <artifactId>client-lib</artifactId>
             <version>7.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.mug</groupId>
+            <artifactId>mug</artifactId>
+            <version>4.5</version>
         </dependency>
     </dependencies>
 </project>

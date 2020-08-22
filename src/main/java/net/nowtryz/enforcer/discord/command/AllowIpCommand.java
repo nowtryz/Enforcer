@@ -49,7 +49,7 @@ public class AllowIpCommand extends AbstractDiscordCommand implements UseFooterC
         channel.createEmbed(embedCreateSpec -> {
             this.createFooter(bot, embedCreateSpec);
             embedCreateSpec.setAuthor(author.getUsername(), null, author.getAvatarUrl());
-            embedCreateSpec.setColor(new Color(this.provider.getEmbedColor()));
+            embedCreateSpec.setColor(this.provider.getEmbedColor());
             embedCreateSpec.setThumbnail(String.format("https://minotar.net/helm/%s/100.png", username));
             embedCreateSpec.setTitle(Translation.DISCORD_IP_ALLOWED.get(username));
         }).block();

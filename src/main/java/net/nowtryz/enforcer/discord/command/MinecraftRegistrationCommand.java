@@ -58,7 +58,7 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
             this.bot.grabRole(playerInfo);
 
             message.getChannel().blockOptional().ifPresent(channel -> channel.createEmbed(embedCreateSpec -> {
-                embedCreateSpec.setColor(new Color(this.provider.getEmbedColor()));
+                embedCreateSpec.setColor(this.provider.getEmbedColor());
                 embedCreateSpec.setAuthor(author.getUsername(), "https://mine.ly/" + username, author.getAvatarUrl());
                 embedCreateSpec.setThumbnail(String.format("https://minotar.net/helm/%s/100.png", username));
                 embedCreateSpec.setTitle(Translation.DISCORD_REGISTERED.get(username));

@@ -28,7 +28,6 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public abstract class AbstractDiscordBot implements Listener, PluginHolder {
-    private static final DecimalFormat tbsFormatter = new DecimalFormat("#.##");
     private Map<String, DiscordCommand> commandMap = new HashMap<>();
     private DiscordCommand[] commands = {};
     private BukkitTask bukkitTask;
@@ -133,7 +132,7 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
 
     public void sendInfo(MessageChannel channel) {
         channel.createEmbed(embedCreateSpec -> {
-            embedCreateSpec.setColor(new Color(this.getDiscordConfig().getEmbedColor()));
+            embedCreateSpec.setColor(this.getDiscordConfig().getEmbedColor());
             embedCreateSpec.setTitle(Translation.DISCORD_AVAILABLE_COMMANDS.get());
             Arrays.stream(this.commands)
                     .filter(DiscordCommand::isEnabled)

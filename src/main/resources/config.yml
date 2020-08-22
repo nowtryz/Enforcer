@@ -33,7 +33,18 @@ discord:
   # color used by the bot in embeds
   embed-color: 1099597
   # Update bot's presence with TPS and player count (not recommended on bungeecord-like networks)
-  presense: true
+  presence: true
+
+  synchronisations:
+    # from discord role to minecraft group
+    down:
+      # role id: "group name"
+    # from minecraft group to discord role
+    up:
+      # group name: role id
+
+
+
 
 
 # use twitch bot to sync twitch community status (Followers / Subs) with server groups

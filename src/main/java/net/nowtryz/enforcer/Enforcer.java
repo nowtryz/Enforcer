@@ -118,7 +118,8 @@ public final class Enforcer extends JavaPlugin {
      */
     private void exportDefaultResource(String fileName) {
         File file = new File(getDataFolder(), fileName);
-        if (!file.exists() && file.mkdirs()) {
+        if (!file.exists()) {
+            if (file.getParentFile().mkdirs()) this.getLogger().info("created folder for locals");
             saveResource(fileName, false);
         }
     }
