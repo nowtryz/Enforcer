@@ -4,6 +4,7 @@ import com.google.mu.util.stream.BiStream;
 import discord4j.core.object.util.Snowflake;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import net.nowtryz.enforcer.util.GroupUtil;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
@@ -57,17 +58,23 @@ public final class DiscordConfigProvider {
 
     private Map<Snowflake, String> parseDownSync(ConfigurationSection downSection) {
         // TODO catch number exception
-        return BiStream.from(downSection.getKeys(false), Snowflake::of, section::getString).toMap();
+        return BiStream.from(downSection.getKeys(false), Snowflake::of, downSection::getString)
+                .toMap();
     }
 
-    private Map<String, Snowflake> parseUpSync(ConfigurationSection downSection) {
+    private Map<String, Snowflake> parseUpSync(ConfigurationSection upSection) {
         // TODO catch number exception
-        return BiStream.from(downSection.getKeys(false), Function.identity(), section::getString)
-                .mapValues(Snowflake::of)
+        return BiStream.from(upSection.getKeys(false), Function.identity(), Function.identity())
+                .mapValues(s -> Snowflake.of(upSection.getString(s)))
+                .mapKeys(GroupUtil::parse)
                 .toMap();
     }
 
     public Optional<String> getGroupForRole(Snowflake role) {
         return Optional.ofNullable(this.roleToGroup.get(role));
+    }
+
+    public Optional<Snowflake> getRoleForGroup(String group) {
+        return Optional.ofNullable(this.groupToRole.get(group));
     }
 }

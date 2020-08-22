@@ -35,11 +35,14 @@ discord:
   # Update bot's presence with TPS and player count (not recommended on bungeecord-like networks)
   presence: true
 
+  # Map groups between discord and Minecraft
   synchronisations:
     # from discord role to minecraft group
     down:
       # role id: "group name"
     # from minecraft group to discord role
+    # Please, replace '.' by '-' to void yaml parse errors
+    # On luck perms use the display name because... https://github.com/lucko/LuckPerms/issues/2261
     up:
       # group name: role id
 
