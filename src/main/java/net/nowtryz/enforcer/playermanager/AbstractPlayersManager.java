@@ -2,6 +2,7 @@ package net.nowtryz.enforcer.playermanager;
 
 import discord4j.core.object.util.Snowflake;
 import net.nowtryz.enforcer.Enforcer;
+import net.nowtryz.enforcer.abstraction.PluginHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -12,7 +13,7 @@ import java.util.UUID;
 /**
  * Manipulates the information storage of players
  */
-public abstract class AbstractPlayersManager implements PlayersManager {
+public abstract class AbstractPlayersManager implements PlayersManager, PluginHolder {
     protected final Enforcer plugin;
 
     /**
@@ -54,5 +55,10 @@ public abstract class AbstractPlayersManager implements PlayersManager {
     @Override
     public void asyncSave() {
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, this::save);
+    }
+
+    @Override
+    public Enforcer getPlugin() {
+        return plugin;
     }
 }

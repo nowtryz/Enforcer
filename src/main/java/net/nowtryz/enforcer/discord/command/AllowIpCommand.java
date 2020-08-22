@@ -5,6 +5,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import net.nowtryz.enforcer.Enforcer;
+import net.nowtryz.enforcer.i18n.Translation;
 import net.nowtryz.enforcer.playermanager.PlayerInfo;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.discord.command.abstraction.AbstractDiscordCommand;
@@ -20,12 +21,12 @@ public class AllowIpCommand extends AbstractDiscordCommand implements UseFooterC
 
     @Override
     public boolean isEnabled() {
-        return this.getProvider().isFirewallEnabled();
+        return this.getConfig().isFirewallEnabled();
     }
 
     @Override
-    public String getDescriptionKey() {
-        return "allow-ip";
+    public Translation getDescriptionTranslation() {
+        return Translation.DISCORD_CMD_DESC_ALLOW_IP;
     }
 
     @Override
@@ -50,10 +51,7 @@ public class AllowIpCommand extends AbstractDiscordCommand implements UseFooterC
             embedCreateSpec.setAuthor(author.getUsername(), null, author.getAvatarUrl());
             embedCreateSpec.setColor(new Color(this.provider.getEmbedColor()));
             embedCreateSpec.setThumbnail(String.format("https://minotar.net/helm/%s/100.png", username));
-            embedCreateSpec.setTitle(this.plugin.translate(
-                    "discord.new-ip-allowed",
-                    username)
-            );
+            embedCreateSpec.setTitle(Translation.DISCORD_IP_ALLOWED.get(username));
         }).block();
     }
 
@@ -62,8 +60,8 @@ public class AllowIpCommand extends AbstractDiscordCommand implements UseFooterC
             this.createFooter(bot, embedCreateSpec);
             embedCreateSpec.setAuthor(author.getUsername(), null, author.getAvatarUrl());
             embedCreateSpec.setColor(Color.red);
-            embedCreateSpec.setTitle(this.plugin.translate("discord.cannot-get-player.title"));
-            embedCreateSpec.setDescription(this.plugin.translate("discord.cannot-get-player.desc"));
+            embedCreateSpec.setTitle(Translation.DISCORD_NO_PLAYER_TITLE.get());
+            embedCreateSpec.setDescription(Translation.DISCORD_NO_PLAYER_DESC.get());
         }).block();
     }
 }

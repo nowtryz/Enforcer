@@ -2,6 +2,7 @@ package net.nowtryz.enforcer.discord.command.abstraction;
 
 import net.nowtryz.enforcer.Enforcer;
 import net.nowtryz.enforcer.abstraction.PluginHolder;
+import net.nowtryz.enforcer.i18n.Translation;
 import net.nowtryz.enforcer.provider.DiscordConfigProvider;
 
 public abstract class AbstractDiscordCommand implements DiscordCommand, PluginHolder {
@@ -27,7 +28,7 @@ public abstract class AbstractDiscordCommand implements DiscordCommand, PluginHo
 
     @Override
     public String getDescription() {
-        return this.plugin.translate("discord.command-description." + this.getDescriptionKey());
+        return this.getDescriptionTranslation().get();
     }
 
     @Override
@@ -35,7 +36,5 @@ public abstract class AbstractDiscordCommand implements DiscordCommand, PluginHo
         return plugin;
     }
 
-    public String getDescriptionKey() {
-        return this.getCommand();
-    }
+    public abstract Translation getDescriptionTranslation();
 }

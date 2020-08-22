@@ -1,6 +1,9 @@
 package net.nowtryz.enforcer.listeners;
 
+import lombok.Getter;
 import net.nowtryz.enforcer.Enforcer;
+import net.nowtryz.enforcer.abstraction.PluginHolder;
+import net.nowtryz.enforcer.i18n.Translation;
 import net.nowtryz.enforcer.playermanager.PlayerInfo;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import org.bukkit.entity.Player;
@@ -11,8 +14,8 @@ import org.bukkit.event.player.PlayerLoginEvent;
 
 import java.util.logging.Level;
 
-public class FirewallListener implements Listener {
-    private final Enforcer plugin;
+public class FirewallListener implements Listener, PluginHolder {
+    @Getter(onMethod_={@Override}) private final Enforcer plugin;
 
     public FirewallListener(Enforcer enforcer) {
         this.plugin = enforcer;
@@ -30,11 +33,13 @@ public class FirewallListener implements Listener {
                 plugin.getLogger().log(Level.INFO, String.format("registering new ip for %s", player.getName()));
                 playerInfo.newIp(event.getAddress());
             }
-            else event.disallow(PlayerLoginEvent.Result.KICK_OTHER, plugin.translate(
-                    "login-denied",
-                    this.plugin.getConfig().getString("discord.prefix") + DiscordBot.NEW_IP
-            ));
+            else event.disallow(
+                PlayerLoginEvent.Result.KICK_OTHER,
+                Translation.LOGIN_DENIED.get(this.getDiscordConfig().getPrefix() + DiscordBot.NEW_IP)
+            );
         }
+
+
 
         playerInfo.allowNewIp(false);
     }

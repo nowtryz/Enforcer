@@ -11,13 +11,31 @@ import org.jetbrains.annotations.NotNull;
 import java.util.logging.Logger;
 
 public interface PluginHolder {
+    /**
+     * Returns the plugin held by this Object
+     * @return the plugin
+     */
     Enforcer getPlugin();
 
-    default @NotNull ConfigProvider getProvider() { return this.getPlugin().getProvider(); }
-    default DiscordConfigProvider getDiscordProvider() { return this.getPlugin().getProvider().getDiscordProvider(); }
-    default TwitchConfigProvider getTwitchProvider() { return this.getPlugin().getProvider().getTwitchProvider(); }
+    /**
+     * Returns the configurations of the plugin
+     * @return the configuration mapper object
+     */
+    default @NotNull ConfigProvider getConfig() { return this.getPlugin().getProvider(); }
+
+    /**
+     * Returns the configurations of the discord bot
+     * @return the configuration mapper object
+     */
+    default DiscordConfigProvider getDiscordConfig() { return this.getPlugin().getProvider().getDiscordProvider(); }
+
+    /**
+     * Returns the configurations of the twitch bot
+     * @return the configuration mapper object
+     */
+    default TwitchConfigProvider getTwitchConfig() { return this.getPlugin().getProvider().getTwitchProvider(); }
+
     default @NotNull PlayersManager getPlayersManager() { return this.getPlugin().getPlayersManager(); }
     default @NotNull Logger getLogger() { return this.getPlugin().getLogger(); }
     default @NotNull Permission getVaultPermission() { return this.getPlugin().getVaultPermission(); }
-    default String translate(String key, Object... args) { return this.getPlugin().translate(key, args); }
 }

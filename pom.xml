@@ -10,15 +10,17 @@
     <packaging>jar</packaging>
 
     <name>Enforcer Plugin</name>
+    <url>http://nowtryz.net</url>
 
-    <description>Enforces login rules and syncs roles with a Discord server and user status on a Twitch channel
+    <description>
+        Enforces login rules and syncs roles with a Discord server and user status on a Twitch channel
     </description>
+
     <properties>
         <netty.version>4.1.48.Final</netty.version>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <url>http://nowtryz.net</url>
 
     <build>
         <defaultGoal>clean package</defaultGoal>
@@ -142,23 +144,34 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- Bukkit server -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.15.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Plugin dependencies -->
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>
             <version>1.7</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Annotations -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>19.0.0</version>
+            <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.12</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Project dependencies -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

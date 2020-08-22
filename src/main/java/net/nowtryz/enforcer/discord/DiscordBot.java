@@ -5,6 +5,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import net.milkbowl.vault.permission.Permission;
 import net.nowtryz.enforcer.Enforcer;
+import net.nowtryz.enforcer.i18n.Translation;
 import net.nowtryz.enforcer.playermanager.PlayerInfo;
 import net.nowtryz.enforcer.discord.command.AllowIpCommand;
 import net.nowtryz.enforcer.discord.command.InfoCommand;
@@ -12,7 +13,6 @@ import net.nowtryz.enforcer.discord.command.MinecraftRegistrationCommand;
 import net.nowtryz.enforcer.discord.command.abstraction.DiscordCommand;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -20,42 +20,24 @@ import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class DiscordBot extends AbstractDiscordBot {
     public final static String REGISTER = "mc", NEW_IP = "newip", INFO = "info"; // TODO put in enum
-    private final Map<String, DiscordCommand> commandMap;
-    private final DiscordCommand[] commands;
 
     public DiscordBot(Enforcer plugin) {
         super(plugin);
 
-        this.commands = new DiscordCommand[]{
+        this.setCommands(new DiscordCommand[]{
                 new MinecraftRegistrationCommand(this, plugin),
                 new InfoCommand(plugin, super::sendInfo),
                 new AllowIpCommand(plugin)
-        };
-
-        this.commandMap = Arrays.stream(commands)
-                .collect(Collectors.toMap(DiscordCommand::getCommand, Function.identity()));
+        });
 
         client.getEventDispatcher().on(MemberUpdateEvent.class)
-                .filter(event -> event.getGuildId().equals(this.getDiscordProvider().getGuild()))
+                .filter(event -> event.getGuildId().equals(this.getDiscordConfig().getGuild()))
                 .subscribe(this::onRoleUpdate);
-    }
-
-    @Override
-    protected DiscordCommand[] getCommands() {
-        return this.commands;
-    }
-
-    @Override
-    protected Map<String, DiscordCommand> getCommandMap() {
-        return this.commandMap;
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -67,7 +49,6 @@ public class DiscordBot extends AbstractDiscordBot {
             return;
         }
 
-        // fixme event not triggered
         this.grabRole(this.plugin.getPlayersManager().getPlayerInfo(event.getUniqueId()));
     }
 
@@ -80,7 +61,7 @@ public class DiscordBot extends AbstractDiscordBot {
 
     public void grabRole(PlayerInfo playerInfo) {
         playerInfo.getDiscordId()
-            .map(userId -> this.client.getMemberById(this.getDiscordProvider().getGuild(), userId))
+            .map(userId -> this.client.getMemberById(this.getDiscordConfig().getGuild(), userId))
             .flatMap(Mono::blockOptional)
             .map(Member::getHighestRole)
             .flatMap(Mono::blockOptional)
@@ -121,7 +102,8 @@ public class DiscordBot extends AbstractDiscordBot {
 
             // if player is online
             Optional.ofNullable(player.getPlayer())
-                    .ifPresent(p -> p.sendMessage(this.translate("group-added", role)));
+                    .ifPresent(p -> Translation.ADDED_TO_GROUP.send(p, role));
+
         } else {
             // put back in old group if operation failed
             oldRole.ifPresent(playerInfo::setDiscordRole);

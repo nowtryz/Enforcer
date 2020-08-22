@@ -6,6 +6,7 @@ import discord4j.core.object.entity.User;
 import net.nowtryz.enforcer.Enforcer;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.discord.command.abstraction.AbstractDiscordCommand;
+import net.nowtryz.enforcer.i18n.Translation;
 
 import java.util.function.Consumer;
 
@@ -15,6 +16,11 @@ public class InfoCommand extends AbstractDiscordCommand {
     public InfoCommand(Enforcer plugin, Consumer<MessageChannel> sendInfo) {
         super(DiscordBot.INFO, plugin);
         this.sendInfo = sendInfo;
+    }
+
+    @Override
+    public Translation getDescriptionTranslation() {
+        return Translation.DISCORD_CMD_DESC_INFO;
     }
 
     @Override

@@ -4,6 +4,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import net.nowtryz.enforcer.Enforcer;
+import net.nowtryz.enforcer.i18n.Translation;
 import net.nowtryz.enforcer.playermanager.PlayerInfo;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.discord.command.abstraction.AbstractDiscordCommand;
@@ -20,8 +21,8 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
     }
 
     @Override
-    public String getDescriptionKey() {
-        return "register";
+    public Translation getDescriptionTranslation() {
+        return Translation.DISCORD_CMD_DESC_REGISTER;
     }
 
     @Override
@@ -48,11 +49,9 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
         PlayerInfo playerInfo = this.getPlayersManager().getPlayerInfo(username);
 
         playerInfo.getDiscordId().flatMap(id -> message.getChannel().blockOptional())
-            .ifPresent(channel -> channel.createMessage(this.plugin.translate(
-                "discord.already-associated",
-                username,
-                author.getMention()
-            )).block());
+            .ifPresent(channel -> channel
+                    .createMessage(Translation.DISCORD_ASSOCIATED.get(username, author.getMention()))
+                    .block());
 
         if (!playerInfo.getDiscordId().isPresent()) {
             playerInfo.setDiscordId(author.getId());
@@ -62,7 +61,7 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
                 embedCreateSpec.setColor(new Color(this.provider.getEmbedColor()));
                 embedCreateSpec.setAuthor(author.getUsername(), "https://mine.ly/" + username, author.getAvatarUrl());
                 embedCreateSpec.setThumbnail(String.format("https://minotar.net/helm/%s/100.png", username));
-                embedCreateSpec.setTitle(this.plugin.translate("discord.registered", username));
+                embedCreateSpec.setTitle(Translation.DISCORD_REGISTERED.get(username));
                 this.createFooter(bot, embedCreateSpec);
             }).block());
         }

@@ -2,6 +2,7 @@ package net.nowtryz.enforcer.twitch;
 
 import net.engio.mbassy.listener.Handler;
 import net.nowtryz.enforcer.Enforcer;
+import net.nowtryz.enforcer.i18n.Translation;
 import net.nowtryz.enforcer.playermanager.PlayerInfo;
 import net.nowtryz.enforcer.abstraction.PluginHolder;
 import org.kitteh.irc.client.library.Client;
@@ -19,14 +20,14 @@ public class TwitchBot implements PluginHolder {
 
     public TwitchBot(Enforcer plugin) {
         this.plugin = plugin;
-        this.channel = '#' + this.getTwitchProvider().getChannel();
+        this.channel = '#' + this.getTwitchConfig().getChannel();
         TwitchDebuger twitchDebuger = new TwitchDebuger(this.getLogger());
         this.client = Client.builder()
-                .nick(this.getTwitchProvider().getUser())
+                .nick(this.getTwitchConfig().getUser())
                 .name("Enforcer")
                 .server()
                     .host("irc.chat.twitch.tv")
-                    .password(this.getTwitchProvider().getToken())
+                    .password(this.getTwitchConfig().getToken())
                     .then()
                     .listeners()
                         .input(twitchDebuger::in)
@@ -64,7 +65,7 @@ public class TwitchBot implements PluginHolder {
         String[] args = event.getMessage().split(" ");
         if (args.length == 0) return;
         if (args[0].length() <= 2) return;
-        if (args[0].charAt(0) != this.getTwitchProvider().getPrefix()) return;
+        if (args[0].charAt(0) != this.getTwitchConfig().getPrefix()) return;
         String command = args[0].substring(1);
 
         if (command.equalsIgnoreCase(REGISTER)) this.registerUser(event.getChannel(), event.getActor().getNick(), args);
@@ -72,7 +73,7 @@ public class TwitchBot implements PluginHolder {
 
     protected void registerUser(Channel channel, String sender, String[] args) {
         if (args.length != 2) {
-            this.sendMissingArgs(this.getTwitchProvider().getPrefix() + REGISTER + " <username>", channel);
+            this.sendMissingArgs(this.getTwitchConfig().getPrefix() + REGISTER + " <username>", channel);
             return;
         }
 
@@ -86,16 +87,16 @@ public class TwitchBot implements PluginHolder {
 
             // TODO get follow and sub status
 
-            channel.sendMessage(this.translate("twitch.registered", sender, username));
+            channel.sendMessage(Translation.TWITCH_REGISTERED.get(sender, username));
         }
     }
 
     private void sendAlreadyAssociated(Channel channel, String username, String twitchUser) {
-        channel.sendMessage(this.translate("twitch.already-associated", username, twitchUser));
+        channel.sendMessage(Translation.TWITCH_ASSOCIATED.get(username, twitchUser));
     }
 
     private void sendMissingArgs(String usage, Channel channel) {
-        channel.sendMessage(this.translate("twitch.missing-args", usage));
+        channel.sendMessage(Translation.TWITCH_MISSING_ARGS.get(usage));
     }
 
     public void disable() {

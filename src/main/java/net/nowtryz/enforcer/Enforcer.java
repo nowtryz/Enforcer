@@ -1,42 +1,35 @@
 package net.nowtryz.enforcer;
 
-import com.google.common.base.Charsets;
+import lombok.Getter;
 import net.milkbowl.vault.permission.Permission;
 import net.nowtryz.enforcer.discord.DiscordBot;
+import net.nowtryz.enforcer.i18n.Translation;
 import net.nowtryz.enforcer.listeners.FirewallListener;
-import net.nowtryz.enforcer.playermanager.AbstractPlayersManager;
 import net.nowtryz.enforcer.playermanager.FilePlayersManager;
 import net.nowtryz.enforcer.playermanager.PlayersManager;
 import net.nowtryz.enforcer.provider.ConfigProvider;
 import net.nowtryz.enforcer.twitch.TwitchBot;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 
 public final class Enforcer extends JavaPlugin {
-    private FileConfiguration lang;
-    private Permission vaultPermission;
-    private PlayersManager playersManager;
+    @Getter private Permission vaultPermission;
+    @Getter private PlayersManager playersManager;
     private DiscordBot discordBot = null;
     private TwitchBot twitchBot = null;
-    private final CountDownLatch enableLatch = new CountDownLatch(1);
-    private ConfigProvider provider;
+    @Getter private final CountDownLatch enableLatch = new CountDownLatch(1);
+    @Getter private ConfigProvider provider;
+
 
     @Override
     public void onEnable() {
@@ -46,9 +39,8 @@ public final class Enforcer extends JavaPlugin {
         this.playersManager = new FilePlayersManager(this);
 
         // load language file
-        InputStream langStream = getResource("fr-FR.yml");
-        Validate.notNull(langStream, "Unable to find language file");
-        this.lang = YamlConfiguration.loadConfiguration(new InputStreamReader(langStream, Charsets.UTF_8));
+        this.exportDefaultResource(Translation.DEFAULT_LANG + ".yml");
+        Translation.init(this);
 
         // Bots
         if (this.provider.discord.isEnabled()) Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
@@ -68,9 +60,9 @@ public final class Enforcer extends JavaPlugin {
         // Vault API
          this.vaultPermission = Objects.requireNonNull(
                  Bukkit.getServicesManager().getRegistration(Permission.class),
-                 "Cannot find a permission system"
+                 "Cannot find a permission system!"
          ).getProvider();
-         this.getLogger().info(this.translate("using-perms", this.vaultPermission.getName()));
+         this.getLogger().info(Translation.USING_PERM_SYSTEM.get(this.vaultPermission.getName()));
 
         // Firewall
         if (!this.getServer().getOnlineMode() && this.provider.isFirewallEnabled()) {
@@ -79,7 +71,7 @@ public final class Enforcer extends JavaPlugin {
         }
 
         // enabled
-        this.getLogger().log(Level.INFO, this.translate("loaded", this.provider.getOwner()));
+        this.getLogger().info(Translation.LOADED.get(this.provider.getOwner()));
         this.enableLatch.countDown();
     }
 
@@ -98,7 +90,7 @@ public final class Enforcer extends JavaPlugin {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
-            Arrays.stream(this.translate("help").split("\n")).forEach(sender::sendMessage);
+            Translation.HELP.send(sender);
             return true;
         }
         else if (args[0].equals("reload")) {
@@ -112,7 +104,7 @@ public final class Enforcer extends JavaPlugin {
             }
         } else if (args[0].equals("clear")) {
             Bukkit.getScheduler().runTaskAsynchronously(this, this.playersManager::clear);
-            sender.sendMessage(this.translate("cleared"));
+            Translation.CLEARED.send(sender);
             return true;
         }
         return false;
@@ -137,44 +129,5 @@ public final class Enforcer extends JavaPlugin {
      */
     public Optional<DiscordBot> getDiscordBot() {
         return Optional.ofNullable(this.discordBot);
-    }
-
-    /**
-     * Getter for the lang object
-     * @return the lang file configuration
-     */
-    public FileConfiguration getLang() {
-        return this.lang;
-    }
-
-    public Permission getVaultPermission() {
-        return vaultPermission;
-    }
-
-    public PlayersManager getPlayersManager() {
-        return playersManager;
-    }
-
-    public CountDownLatch getEnableLatch() {
-        return enableLatch;
-    }
-
-    public ConfigProvider getProvider() {
-        return provider;
-    }
-
-    /**
-     * Translate the given key using the language file
-     * @param key the key to get from the language file
-     * @param args variable to use in the string formatter
-     * @return the formatted translated string
-     */
-    public String translate(String key, Object... args) {
-        Validate.notNull(key, "key is missing");
-        String translation = this.lang.getString(key);
-        Validate.notNull(translation, "no translation for " + key);
-
-        if (args.length > 0) return String.format(translation, args);
-        else return translation;
     }
 }

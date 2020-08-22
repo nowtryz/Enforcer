@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +49,8 @@ public class FilePlayersManager extends AbstractPlayersManager {
                     this.config.getString("version", "unknown")
             ));
 
+            // fixme clear unused player information from player.yml
+
         } catch (IOException e) {
             this.plugin.getLogger().severe("Unable to load players data");
         }
@@ -55,19 +58,19 @@ public class FilePlayersManager extends AbstractPlayersManager {
 
     @Override
     @SuppressWarnings("deprecation")
-    public PlayerInfo getPlayerInfo(String playerName) {
+    public @NotNull PlayerInfo getPlayerInfo(@NotNull String playerName) {
         // We need to get offline player from name to translate it into unique id, hence the deprecation bypass
         return this.getPlayerInfo(Bukkit.getOfflinePlayer(playerName).getUniqueId());
     }
 
     @Override
-    public PlayerInfo getPlayerInfo(UUID uuid) {
+    public @NotNull PlayerInfo getPlayerInfo(@NotNull UUID uuid) {
         ConfigurationSection section = this.getPlayerSection(uuid);
         return new FilePlayerInfo(uuid, section, this);
     }
 
     @Override
-    public Optional<PlayerInfo> getPlayerFromDiscord(Snowflake userId) {
+    public @NotNull Optional<PlayerInfo> getPlayerFromDiscord(@NotNull Snowflake userId) {
         ConfigurationSection section = this.discord.getConfigurationSection(userId.asString());
 
         if (section != null) {
