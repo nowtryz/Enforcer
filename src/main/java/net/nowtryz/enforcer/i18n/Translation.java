@@ -47,6 +47,18 @@ public enum Translation {
     DISCORD_8D("discord.8=D", "Oh! Gross!"),
     DISCORD_CMD_DESC_REGISTER("discord.command-description.register", "Associate your discord with a " +
             "**Minecraft** account to sync roles between the server and discord"),
+    DISCORD_LINKED("discord.linked", "Your account has sucessfully been linked to %s#%s!"),
+    DISCORD_CONFIRMATION_HEADER("discord.confirmation.header", "Are you the owner of %s#%s?"),
+    DISCORD_CONFIRMATION_FOOTER("discord.confirmation.footer", ""),
+    DISCORD_CONFIRMATION_REFUSED("discord.confirmation.refused", "Confirmation refused"),
+    DISCORD_CONFIRMATION_EXPIRED("discord.confirmation.expired", "This confirmation demand has expired"),
+    DISCORD_CONFIRMATION_SENT("discord.confirmation.sent", "A confirmation message has been sent to %s"),
+    DISCORD_MUST_BE_ONLINE(
+            "discord.must-be-online",
+            "You must online on the server to link your discord account"),
+    DISCORD_CONFIRMATION_ACCEPT("discord.confirmation.accept", "[YES]"),
+    DISCORD_CONFIRMATION_REFUSE("discord.confirmation.refuse", "[NO"),
+    DISCORD_CONFIRMATION_CLICK("discord.confirmation.click", "Click to validate"),
     DISCORD_CMD_DESC_ALLOW_IP("discord.command-description.allow-ip", "Add a new ip to the firewall"),
     DISCORD_CMD_DESC_INFO("discord.command-description.info", "Show this help"),
     TWITCH_MISSING_ARGS("twitch.missing-args", "/me: Missing arguments! Use: %s"),
@@ -109,9 +121,11 @@ public enum Translation {
     }
 
     private void init(FileConfiguration lang) {
-        if (this.key == null) this.translatedMessage = this.defaultMessage;
-        else if (lang.isList(this.key)) this.translatedMessage = String.join(LF, lang.getStringList(this.key));
+        if (this.key == null) this.translatedMessage = ChatColor.translateAlternateColorCodes('&', this.defaultMessage);
+        else if (lang.isList(this.key))this.translatedMessage = ChatColor
+                .translateAlternateColorCodes('&', String.join(LF, lang.getStringList(this.key)));
         else this.translatedMessage = Optional.ofNullable(lang.getString(this.key))
+                    .map(s -> ChatColor.translateAlternateColorCodes('&', s))
                     .orElse(this.defaultMessage);
     }
 

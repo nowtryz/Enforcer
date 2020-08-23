@@ -16,13 +16,27 @@ discord:
   new-ip-allowed: "Demande approuvée pour *%s* ! Connecte-toi rapidement."
   logged-to: "Bot connecté au serveur %s"
   bot-mentioned: "Hey %s ! Mon prefix est `%c`"
+  linked: "§7Ton compte a été associé à §6§l%s#%s§r§7 avec succès !"
+  must-be-online: "Tu dois être connecté au serveur pour lier ton compte discord"
   already-associated: ":x: *%s* est déjà associé à %s !"
   missing-args: ":x: Arguments manquants"
   footer: "Faites `%s` pour la liste des commandes"
-  available-commands: "Commandes disponibes :"
+  available-commands: "Commandes disponibles :"
   cannot-get-player:
-    title: ":x: Impossible de recupérer le joueur associé à ton compte discord..."
+    title: ":x: Impossible de récupérer le joueur associé à ton compte discord..."
     desc: "As-tu enregistré ton compte minecraft ?"
+  confirmation:
+    header: |-
+      &m                                                                      &r
+      &8&l» &r&7Es-tu bien le détentaeur du compte dicord &r&6&l%s#%s&r&7 ?
+    footer: |-
+      &m                                                                      &r
+    accept: "&l&a[OUI]"
+    refuse: "&l&c[NON]"
+    click: "&L&1» &r&9Clique pour valider"
+    sent: "Un message de confirmation a été envoyé à `%s`"
+    expired: "&cCet demande de confirmation a expiré"
+    refused: "&7La demande de confirmation a été rejetée !"
   registered: "Ton compte discord a été associé à *%s* !"
   8=D: "C'est pas très poli tout ça %s !"
   command-description:

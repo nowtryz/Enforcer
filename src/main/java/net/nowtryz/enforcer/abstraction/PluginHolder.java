@@ -2,12 +2,14 @@ package net.nowtryz.enforcer.abstraction;
 
 import net.milkbowl.vault.permission.Permission;
 import net.nowtryz.enforcer.Enforcer;
+import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.storage.PlayersStorage;
 import net.nowtryz.enforcer.provider.ConfigProvider;
 import net.nowtryz.enforcer.provider.DiscordConfigProvider;
 import net.nowtryz.enforcer.provider.TwitchConfigProvider;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
 import java.util.logging.Logger;
 
 public interface PluginHolder {
@@ -38,4 +40,5 @@ public interface PluginHolder {
     default @NotNull PlayersStorage getPlayersManager() { return this.getPlugin().getPlayersManager(); }
     default @NotNull Logger getLogger() { return this.getPlugin().getLogger(); }
     default @NotNull Permission getVaultPermission() { return this.getPlugin().getVaultPermission(); }
+    default Optional<DiscordBot> getDiscordBot() { return this.getPlugin().getDiscordBot(); }
 }

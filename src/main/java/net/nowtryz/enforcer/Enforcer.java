@@ -5,6 +5,7 @@ import net.milkbowl.vault.permission.Permission;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.i18n.Translation;
 import net.nowtryz.enforcer.listeners.FirewallListener;
+import net.nowtryz.enforcer.manager.DiscordConfirmationManager;
 import net.nowtryz.enforcer.storage.flatfile.FilePlayersStorage;
 import net.nowtryz.enforcer.storage.PlayersStorage;
 import net.nowtryz.enforcer.provider.ConfigProvider;
@@ -12,6 +13,7 @@ import net.nowtryz.enforcer.twitch.TwitchBot;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -19,17 +21,19 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 
+@Getter
 public final class Enforcer extends JavaPlugin {
-    @Getter private Permission vaultPermission;
-    @Getter private PlayersStorage playersManager;
+    private Permission vaultPermission;
+    private PlayersStorage playersManager;
     private DiscordBot discordBot = null;
     private TwitchBot twitchBot = null;
-    @Getter private final CountDownLatch enableLatch = new CountDownLatch(1);
-    @Getter private ConfigProvider provider;
-
+    private final CountDownLatch enableLatch = new CountDownLatch(1);
+    private ConfigProvider provider;
+    private DiscordConfirmationManager discordConfirmationManager = null;
 
     @Override
     public void onEnable() {
@@ -45,6 +49,7 @@ public final class Enforcer extends JavaPlugin {
         // Bots
         if (this.provider.discord.isEnabled()) Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             this.getLogger().info("Starting discord bot");
+            this.discordConfirmationManager = new DiscordConfirmationManager(this);
             this.discordBot = new DiscordBot(this);
             this.discordBot.block();
         });
@@ -93,20 +98,42 @@ public final class Enforcer extends JavaPlugin {
             Translation.HELP.send(sender);
             return true;
         }
-        else if (args[0].equals("reload")) {
-            if (label.equals("enforcer") && sender.hasPermission("enforcer.reload")) {
-                Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-                    this.onDisable();
-                    this.reloadConfig();
-                    this.onEnable();
-                });
+
+        switch (args[0].toLowerCase()) {
+            case "accept":
+                if (!(sender instanceof Player)) return true;
+                if (args.length != 2) return true;
+                UUID request = UUID.fromString(args[1]);
+
+                if (this.discordConfirmationManager.hasRequestPending(request)) {
+                    this.discordConfirmationManager.accept((Player) sender, request);
+                } else Translation.DISCORD_CONFIRMATION_EXPIRED.send(sender);
+
                 return true;
-            }
-        } else if (args[0].equals("clear")) {
-            Bukkit.getScheduler().runTaskAsynchronously(this, this.playersManager::clear);
-            Translation.CLEARED.send(sender);
-            return true;
+            case "refuse":
+                if (!(sender instanceof Player)) return true;
+                if (args.length != 2) return true;
+                UUID refusedRequest = UUID.fromString(args[1]);
+                if (this.discordConfirmationManager.hasRequestPending(refusedRequest)) {
+                    this.discordConfirmationManager.refuse((Player) sender, refusedRequest);
+                } else Translation.DISCORD_CONFIRMATION_EXPIRED.send(sender);
+                return true;
+            case "reload":
+                if (label.equals("enforcer") && sender.hasPermission("enforcer.reload")) {
+                    Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+                        this.onDisable();
+                        this.reloadConfig();
+                        this.onEnable();
+                    });
+                    return true;
+                }
+                break;
+            case "clear":
+                Bukkit.getScheduler().runTaskAsynchronously(this, this.playersManager::clear);
+                Translation.CLEARED.send(sender);
+                return true;
         }
+
         return false;
     }
 

@@ -20,6 +20,7 @@ public final class DiscordConfigProvider {
     private final ConfigurationSection section;
     private final Snowflake guild;
     private final char prefix;
+    private final long confirmationTimeout;
     private final Color embedColor;
     private final boolean enabled;
     private final String token;
@@ -45,7 +46,8 @@ public final class DiscordConfigProvider {
         this.prefix = prefixField.charAt(0);
         this.embedColor = new Color(section.getInt("embed-color", 14528782));
         this.doesUpdatePresence = section.getBoolean("presence", true);
-        this.confirmationRequired = section.getBoolean("confirmation", false);
+        this.confirmationRequired = section.getBoolean("confirmation.required", false);
+        this.confirmationTimeout = this.extractTimeout(section.getLong("confirmation.timeout", 120));
 
         this.roleToGroup = this.parseDownSync(section.getConfigurationSection("synchronisations.down"));
         this.groupToRole = this.parseUpSync(section.getConfigurationSection("synchronisations.up"));
@@ -56,6 +58,11 @@ public final class DiscordConfigProvider {
             Validate.notNull(this.token, "Discord token cannot be null");
             Validate.isTrue(prefixField.length() == 1, "Discord prefix must be a character");
         }
+    }
+
+    private long extractTimeout(long value) {
+        if (value <= 0) return 120;
+        else return value;
     }
 
     private Map<Snowflake, String> parseDownSync(ConfigurationSection downSection) {

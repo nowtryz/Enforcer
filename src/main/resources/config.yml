@@ -34,8 +34,13 @@ discord:
   embed-color: 1099597
   # Update bot's presence with TPS and player count (not recommended on bungeecord-like networks)
   presence: true
-  # Ask confirmation to the player to ensure authenticity
-  confirmation: false
+
+  confirmation:
+    # Ask confirmation to the player to ensure authenticity
+    required: false
+    # Time in seconds before confirmations are cancelled
+    timeout: 120
+
 
   # Map groups between discord and Minecraft
   synchronisations:
