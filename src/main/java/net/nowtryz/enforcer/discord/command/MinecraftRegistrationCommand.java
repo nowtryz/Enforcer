@@ -3,14 +3,15 @@ package net.nowtryz.enforcer.discord.command;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 import net.nowtryz.enforcer.Enforcer;
 import net.nowtryz.enforcer.i18n.Translation;
-import net.nowtryz.enforcer.playermanager.PlayerInfo;
+import net.nowtryz.enforcer.storage.PlayerInfo;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.discord.command.abstraction.AbstractDiscordCommand;
 import net.nowtryz.enforcer.discord.command.abstraction.UseArgumentsCommand;
 
-import java.awt.*;
+import java.util.Optional;
 
 public class MinecraftRegistrationCommand extends AbstractDiscordCommand implements UseArgumentsCommand {
     private final DiscordBot bot;
@@ -48,22 +49,25 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
         String username = args[1];
         PlayerInfo playerInfo = this.getPlayersManager().getPlayerInfo(username);
 
-        playerInfo.getDiscordId().flatMap(id -> message.getChannel().blockOptional())
-            .ifPresent(channel -> channel
-                    .createMessage(Translation.DISCORD_ASSOCIATED.get(username, author.getMention()))
-                    .block());
+        if (playerInfo.getDiscordId().isPresent()) {
+            Snowflake id = playerInfo.getDiscordId().get();
+            message.getChannel()
+                    .flatMap(channel -> channel.createMessage(Translation.DISCORD_ASSOCIATED.get(username, "<@"+ id.asString() +">")))
+                    .subscribe();
+        } else if (this.getDiscordConfig().isConfirmationRequired()) {
 
-        if (!playerInfo.getDiscordId().isPresent()) {
+        } else {
             playerInfo.setDiscordId(author.getId());
             this.bot.grabRole(playerInfo);
 
-            message.getChannel().blockOptional().ifPresent(channel -> channel.createEmbed(embedCreateSpec -> {
-                embedCreateSpec.setColor(this.provider.getEmbedColor());
-                embedCreateSpec.setAuthor(author.getUsername(), "https://mine.ly/" + username, author.getAvatarUrl());
-                embedCreateSpec.setThumbnail(String.format("https://minotar.net/helm/%s/100.png", username));
-                embedCreateSpec.setTitle(Translation.DISCORD_REGISTERED.get(username));
-                this.createFooter(bot, embedCreateSpec);
-            }).block());
+            message.getChannel()
+                    .map(channel -> channel.createEmbed(embedCreateSpec -> {
+                        embedCreateSpec.setColor(this.provider.getEmbedColor());
+                        embedCreateSpec.setAuthor(author.getUsername(), "https://mine.ly/" + username, author.getAvatarUrl());
+                        embedCreateSpec.setThumbnail(String.format("https://minotar.net/helm/%s/100.png", username));
+                        embedCreateSpec.setTitle(Translation.DISCORD_REGISTERED.get(username));
+                        this.createFooter(bot, embedCreateSpec);
+                    })).subscribe();
         }
     }
 }

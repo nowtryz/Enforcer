@@ -18,13 +18,11 @@ import net.nowtryz.enforcer.tps.TPS;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.awt.*;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Function;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public abstract class AbstractDiscordBot implements Listener, PluginHolder {
@@ -66,18 +64,16 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
         this.user = event.getSelf();
         this.plugin.getLogger().info(Translation.DISCORD_READY.get(user.getUsername(), user.getDiscriminator()));
 
-        event.getGuilds().stream().parallel()
+        Flux.fromStream(event.getGuilds().stream())
                 .map(ReadyEvent.Guild::getId)
-                .map(client::getGuildById)
-                .map(Mono::block)
+                .flatMap(client::getGuildById)
                 .filter(Objects::nonNull)
                 .filter(server -> server.getId().equals(this.getDiscordConfig().getGuild()))
-                .findFirst()
+                .next()
                 .map(Guild::getName)
                 .map(Translation.DISCORD_LOGGED::get)
-                .ifPresent(this.plugin.getLogger()::info);
-
-        Bukkit.getScheduler().runTask(this.plugin, this::register);
+                .doOnNext(this.plugin.getLogger()::info)
+                .subscribe(unused -> Bukkit.getScheduler().runTask(this.plugin, this::register));
     }
 
     public final void onMessage(MessageCreateEvent event) {
@@ -86,7 +82,7 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
         if (message.getContent().orElse("").matches(".*8=+D.*")) {
             message.getAuthor().ifPresent(author -> message.getChannel()
                 .flatMap(channel -> channel.createMessage(Translation.DISCORD_8D.get(author.getMention())))
-                .block()
+                .subscribe()
             );
         }
 
@@ -107,13 +103,16 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
     }
 
     private void onBotMention(Message message) {
-        message.getAuthor().ifPresent(author -> message.getChannel().blockOptional().ifPresent(channel -> {
-            channel.createMessage(Translation.DISCORD_MENTIONED.get(
-                    author.getMention(),
-                    this.getDiscordConfig().getPrefix()
-            )).block();
-            this.sendInfo(channel);
-        }));
+        this.plugin.getLogger().info("mentioned");
+        message.getAuthor().ifPresent(author -> message.getChannel()
+                .flatMapMany(channel -> Flux.merge(
+                        channel.createMessage(Translation.DISCORD_MENTIONED.get(
+                            author.getMention(),
+                            this.getDiscordConfig().getPrefix()
+                        )),
+                        this.sendInfo(channel)
+                )).subscribe()
+        );
     }
 
     protected void updatePresence() {
@@ -121,17 +120,15 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
                 TPS.getTPS(),
                 Bukkit.getServer().getOnlinePlayers().size(),
                 Bukkit.getServer().getMaxPlayers()
-        )))).block();
-
-
+        )))).subscribe();
     }
 
     private boolean isBotMentioned(Message message) {
         return message.getUserMentionIds().contains(this.user.getId());
     }
 
-    public void sendInfo(MessageChannel channel) {
-        channel.createEmbed(embedCreateSpec -> {
+    public Mono<Message> sendInfo(MessageChannel channel) {
+        return channel.createEmbed(embedCreateSpec -> {
             embedCreateSpec.setColor(this.getDiscordConfig().getEmbedColor());
             embedCreateSpec.setTitle(Translation.DISCORD_AVAILABLE_COMMANDS.get());
             Arrays.stream(this.commands)
@@ -141,7 +138,7 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
                             command.getDescription(),
                             false
                     ));
-        }).block();
+        });
     }
 
     @Override

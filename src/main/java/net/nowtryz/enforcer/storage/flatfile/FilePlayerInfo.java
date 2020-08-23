@@ -1,6 +1,7 @@
-package net.nowtryz.enforcer.playermanager;
+package net.nowtryz.enforcer.storage.flatfile;
 
 import discord4j.core.object.util.Snowflake;
+import net.nowtryz.enforcer.storage.PlayerInfo;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,9 +12,9 @@ import java.util.UUID;
 
 public class FilePlayerInfo extends PlayerInfo {
     ConfigurationSection playerSection, discordSection;
-    private final FilePlayersManager manager;
+    private final FilePlayersStorage manager;
 
-    FilePlayerInfo(@NotNull UUID uuid, @NotNull ConfigurationSection playerSection, @NotNull FilePlayersManager manager) {
+    FilePlayerInfo(@NotNull UUID uuid, @NotNull ConfigurationSection playerSection, @NotNull FilePlayersStorage manager) {
         super(uuid);
         this.manager = manager;
         this.playerSection = playerSection;
@@ -43,14 +44,6 @@ public class FilePlayerInfo extends PlayerInfo {
     }
 
     @Override
-    public Optional<String> getDiscordRole() {
-        return Optional.ofNullable(playerSection.getString("discord"))
-                .filter(id -> Long.parseLong(id) != 0)
-                .map(this.manager.discord::getConfigurationSection)
-                .map(section -> section.getString("role"));
-    }
-
-    @Override
     public void allowNewIp(boolean doAllow) {
         this.manager.allowNewIp(this, doAllow);
     }
@@ -69,12 +62,6 @@ public class FilePlayerInfo extends PlayerInfo {
     @Override
     public void setDiscordId(Snowflake id) {
         this.manager.registerDiscordAccount(id, this);
-        this.manager.asyncSave();
-    }
-
-    @Override
-    public void setDiscordRole(String role) {
-        Optional.ofNullable(this.discordSection).ifPresent(section -> section.set("role", role));
         this.manager.asyncSave();
     }
 

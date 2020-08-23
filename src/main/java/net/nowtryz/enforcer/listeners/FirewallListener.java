@@ -4,7 +4,7 @@ import lombok.Getter;
 import net.nowtryz.enforcer.Enforcer;
 import net.nowtryz.enforcer.abstraction.PluginHolder;
 import net.nowtryz.enforcer.i18n.Translation;
-import net.nowtryz.enforcer.playermanager.PlayerInfo;
+import net.nowtryz.enforcer.storage.PlayerInfo;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

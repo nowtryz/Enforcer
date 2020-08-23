@@ -5,8 +5,8 @@ import net.milkbowl.vault.permission.Permission;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.i18n.Translation;
 import net.nowtryz.enforcer.listeners.FirewallListener;
-import net.nowtryz.enforcer.playermanager.FilePlayersManager;
-import net.nowtryz.enforcer.playermanager.PlayersManager;
+import net.nowtryz.enforcer.storage.flatfile.FilePlayersStorage;
+import net.nowtryz.enforcer.storage.PlayersStorage;
 import net.nowtryz.enforcer.provider.ConfigProvider;
 import net.nowtryz.enforcer.twitch.TwitchBot;
 import org.bukkit.Bukkit;
@@ -24,7 +24,7 @@ import java.util.logging.Level;
 
 public final class Enforcer extends JavaPlugin {
     @Getter private Permission vaultPermission;
-    @Getter private PlayersManager playersManager;
+    @Getter private PlayersStorage playersManager;
     private DiscordBot discordBot = null;
     private TwitchBot twitchBot = null;
     @Getter private final CountDownLatch enableLatch = new CountDownLatch(1);
@@ -36,7 +36,7 @@ public final class Enforcer extends JavaPlugin {
         // Plugin startup logic
         super.saveDefaultConfig();
         this.provider = new ConfigProvider(this);
-        this.playersManager = new FilePlayersManager(this);
+        this.playersManager = new FilePlayersStorage(this);
 
         // load language file
         this.exportDefaultResource(Translation.DEFAULT_LANG + ".yml");
@@ -80,7 +80,7 @@ public final class Enforcer extends JavaPlugin {
         HandlerList.unregisterAll(this);
         Optional.ofNullable(this.twitchBot).ifPresent(TwitchBot::disable);
         Optional.ofNullable(this.discordBot).ifPresent(DiscordBot::disable);
-        Optional.ofNullable(this.playersManager).ifPresent(PlayersManager::save);
+        Optional.ofNullable(this.playersManager).ifPresent(PlayersStorage::save);
 
         this.discordBot = null;
         this.twitchBot = null;

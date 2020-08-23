@@ -1,4 +1,4 @@
-package net.nowtryz.enforcer.playermanager;
+package net.nowtryz.enforcer.storage;
 
 import discord4j.core.object.util.Snowflake;
 import org.bukkit.Bukkit;
@@ -43,8 +43,6 @@ public abstract class PlayerInfo {
 
     public abstract boolean isRegisteringNewIp();
 
-    public abstract Optional<String> getDiscordRole();
-
     public abstract void allowNewIp(boolean doAllow);
 
     public abstract void allowNewIp();
@@ -52,8 +50,6 @@ public abstract class PlayerInfo {
     public abstract void newIp(InetAddress ip);
 
     public abstract void setDiscordId(Snowflake id);
-
-    public abstract void setDiscordRole(String role);
 
     public abstract void setTwitchUsername(String username);
 }

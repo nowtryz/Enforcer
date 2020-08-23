@@ -27,6 +27,7 @@ public final class DiscordConfigProvider {
     private final boolean doesUpdatePresence;
     private final Map<Snowflake, String> roleToGroup;
     private final Map<String, Snowflake> groupToRole;
+    private final boolean confirmationRequired;
 
 
     DiscordConfigProvider(@Nullable ConfigurationSection section) {
@@ -44,6 +45,7 @@ public final class DiscordConfigProvider {
         this.prefix = prefixField.charAt(0);
         this.embedColor = new Color(section.getInt("embed-color", 14528782));
         this.doesUpdatePresence = section.getBoolean("presence", true);
+        this.confirmationRequired = section.getBoolean("confirmation", false);
 
         this.roleToGroup = this.parseDownSync(section.getConfigurationSection("synchronisations.down"));
         this.groupToRole = this.parseUpSync(section.getConfigurationSection("synchronisations.up"));

@@ -2,7 +2,7 @@ package net.nowtryz.enforcer.abstraction;
 
 import net.milkbowl.vault.permission.Permission;
 import net.nowtryz.enforcer.Enforcer;
-import net.nowtryz.enforcer.playermanager.PlayersManager;
+import net.nowtryz.enforcer.storage.PlayersStorage;
 import net.nowtryz.enforcer.provider.ConfigProvider;
 import net.nowtryz.enforcer.provider.DiscordConfigProvider;
 import net.nowtryz.enforcer.provider.TwitchConfigProvider;
@@ -35,7 +35,7 @@ public interface PluginHolder {
      */
     default TwitchConfigProvider getTwitchConfig() { return this.getPlugin().getProvider().getTwitchProvider(); }
 
-    default @NotNull PlayersManager getPlayersManager() { return this.getPlugin().getPlayersManager(); }
+    default @NotNull PlayersStorage getPlayersManager() { return this.getPlugin().getPlayersManager(); }
     default @NotNull Logger getLogger() { return this.getPlugin().getLogger(); }
     default @NotNull Permission getVaultPermission() { return this.getPlugin().getVaultPermission(); }
 }

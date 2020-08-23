@@ -1,4 +1,4 @@
-package net.nowtryz.enforcer.playermanager;
+package net.nowtryz.enforcer.storage;
 
 import discord4j.core.object.util.Snowflake;
 import org.jetbrains.annotations.NotNull;
@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface PlayersManager {
+public interface PlayersStorage {
     /**
      * Retrieve the {@link PlayerInfo} associated to a player from its name
      * @param playerName the username of the player
@@ -40,7 +40,7 @@ public interface PlayersManager {
     void save();
 
     /**
-     * Perform a {@link PlayersManager#save()} asynchronously.
+     * Perform a {@link PlayersStorage#save()} asynchronously.
      */
     void asyncSave();
 }

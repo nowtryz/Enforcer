@@ -3,7 +3,7 @@ package net.nowtryz.enforcer.twitch;
 import net.engio.mbassy.listener.Handler;
 import net.nowtryz.enforcer.Enforcer;
 import net.nowtryz.enforcer.i18n.Translation;
-import net.nowtryz.enforcer.playermanager.PlayerInfo;
+import net.nowtryz.enforcer.storage.PlayerInfo;
 import net.nowtryz.enforcer.abstraction.PluginHolder;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.element.Channel;

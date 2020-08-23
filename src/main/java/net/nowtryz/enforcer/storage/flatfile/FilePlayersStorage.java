@@ -1,8 +1,10 @@
-package net.nowtryz.enforcer.playermanager;
+package net.nowtryz.enforcer.storage.flatfile;
 
 import com.google.common.base.Charsets;
 import discord4j.core.object.util.Snowflake;
 import net.nowtryz.enforcer.Enforcer;
+import net.nowtryz.enforcer.storage.AbstractPlayersStorage;
+import net.nowtryz.enforcer.storage.PlayerInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -17,7 +19,7 @@ import java.net.InetAddress;
 import java.util.*;
 import java.util.logging.Level;
 
-public class FilePlayersManager extends AbstractPlayersManager {
+public class FilePlayersStorage extends AbstractPlayersStorage {
     private final File playersFile;
     private FileConfiguration config;
 
@@ -29,7 +31,7 @@ public class FilePlayersManager extends AbstractPlayersManager {
      *     File implementation
      * @param plugin the instance of the enforcer plugin
      */
-    public FilePlayersManager(Enforcer plugin) {
+    public FilePlayersStorage(Enforcer plugin) {
         super(plugin);
         this.playersFile = new File(plugin.getDataFolder(), "players.yml");
 
@@ -118,8 +120,8 @@ public class FilePlayersManager extends AbstractPlayersManager {
             discordSection = this.discord.createSection(userId.asString());
         }
 
-        this.getPlayerSection(info.uuid).set("discord", userId.asLong());
-        discordSection.set("mc", info.uuid.toString());
+        this.getPlayerSection(info.getUniqueId()).set("discord", userId.asLong());
+        discordSection.set("mc", info.getUniqueId().toString());
         discordSection.set("role", null);
     }
 
@@ -135,20 +137,20 @@ public class FilePlayersManager extends AbstractPlayersManager {
             twitchSection = this.discord.createSection(twitchUser);
         }
 
-        this.getPlayerSection(info.uuid).set("twitch", twitchUser);
-        twitchSection.set("mc", info.uuid.toString());
+        this.getPlayerSection(info.getUniqueId()).set("twitch", twitchUser);
+        twitchSection.set("mc", info.getUniqueId().toString());
         twitchSection.set("follow", false);
         twitchSection.set("sub", false);
     }
 
     @Override
     public void allowNewIp(PlayerInfo info, boolean doAllow) {
-        this.getPlayerSection(info.uuid).set("registering-new-ip", doAllow);
+        this.getPlayerSection(info.getUniqueId()).set("registering-new-ip", doAllow);
     }
 
     @Override
     public void registerNewIp(InetAddress ip, PlayerInfo info) {
-        ConfigurationSection section = this.getPlayerSection(info.uuid);
+        ConfigurationSection section = this.getPlayerSection(info.getUniqueId());
         List<String> ips = info.getIps();
         ips.add(ip.getHostName());
         section.set("ip", ips);

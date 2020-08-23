@@ -11,7 +11,7 @@ import net.nowtryz.enforcer.discord.command.InfoCommand;
 import net.nowtryz.enforcer.discord.command.MinecraftRegistrationCommand;
 import net.nowtryz.enforcer.discord.command.abstraction.DiscordCommand;
 import net.nowtryz.enforcer.i18n.Translation;
-import net.nowtryz.enforcer.playermanager.PlayerInfo;
+import net.nowtryz.enforcer.storage.PlayerInfo;
 import net.nowtryz.enforcer.util.GroupUtil;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

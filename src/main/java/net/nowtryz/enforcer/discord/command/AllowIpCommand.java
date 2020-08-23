@@ -5,14 +5,14 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import net.nowtryz.enforcer.Enforcer;
-import net.nowtryz.enforcer.i18n.Translation;
-import net.nowtryz.enforcer.playermanager.PlayerInfo;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.discord.command.abstraction.AbstractDiscordCommand;
 import net.nowtryz.enforcer.discord.command.abstraction.UseFooterCommand;
+import net.nowtryz.enforcer.i18n.Translation;
+import net.nowtryz.enforcer.storage.PlayerInfo;
+import reactor.core.publisher.Mono;
 
 import java.awt.*;
-import java.util.Optional;
 
 public class AllowIpCommand extends AbstractDiscordCommand implements UseFooterCommand {
     public AllowIpCommand(Enforcer plugin) {
@@ -36,32 +36,32 @@ public class AllowIpCommand extends AbstractDiscordCommand implements UseFooterC
     }
 
     private void performAction(User bot, User author, Message message) {
-        Optional<PlayerInfo> playerInfo = this.plugin.getPlayersManager().getPlayerFromDiscord(author.getId());
-        message.getChannel().blockOptional().ifPresent(channel -> {
-            playerInfo.ifPresent(info -> this.allowNewIp(info, channel, bot, author));
-            if (!playerInfo.isPresent()) this.sendError(bot, author, channel);
-        });
+        message.getChannel()
+                .map(channel -> this.getPlayersManager().getPlayerFromDiscord(author.getId())
+                        .map(info -> this.allowNewIp(info, channel, bot, author))
+                        .orElseGet(() -> this.sendError(bot, author, channel))
+                ).subscribe();
     }
 
-    private void allowNewIp(PlayerInfo playerInfo, MessageChannel channel, User bot, User author) {
+    private Mono<Message> allowNewIp(PlayerInfo playerInfo, MessageChannel channel, User bot, User author) {
         String username = playerInfo.getPlayer().getName();
         playerInfo.allowNewIp();
-        channel.createEmbed(embedCreateSpec -> {
+        return channel.createEmbed(embedCreateSpec -> {
             this.createFooter(bot, embedCreateSpec);
             embedCreateSpec.setAuthor(author.getUsername(), null, author.getAvatarUrl());
             embedCreateSpec.setColor(this.provider.getEmbedColor());
             embedCreateSpec.setThumbnail(String.format("https://minotar.net/helm/%s/100.png", username));
             embedCreateSpec.setTitle(Translation.DISCORD_IP_ALLOWED.get(username));
-        }).block();
+        });
     }
 
-    private void sendError(User bot, User author, MessageChannel channel) {
-        channel.createEmbed(embedCreateSpec -> {
+    private Mono<Message> sendError(User bot, User author, MessageChannel channel) {
+        return channel.createEmbed(embedCreateSpec -> {
             this.createFooter(bot, embedCreateSpec);
             embedCreateSpec.setAuthor(author.getUsername(), null, author.getAvatarUrl());
             embedCreateSpec.setColor(Color.red);
             embedCreateSpec.setTitle(Translation.DISCORD_NO_PLAYER_TITLE.get());
             embedCreateSpec.setDescription(Translation.DISCORD_NO_PLAYER_DESC.get());
-        }).block();
+        });
     }
 }
