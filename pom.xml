@@ -6,7 +6,7 @@
 
     <groupId>net.nowtryz</groupId>
     <artifactId>Enforcer</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-LASTSKY-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Enforcer Plugin</name>

@@ -53,21 +53,24 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
 
         if (playerInfo.getDiscordId().isPresent()) {
             Snowflake id = playerInfo.getDiscordId().get();
-            message.getChannel()
+            author.getPrivateChannel()
                     .flatMap(channel -> channel.createMessage(Translation.DISCORD_ASSOCIATED.get(username, "<@"+ id.asString() +">")))
+                    .then(message.delete())
                     .subscribe();
         } else if (!this.getDiscordConfig().isConfirmationRequired()) {
             playerInfo.setDiscordId(author.getId());
             this.bot.grabRole(playerInfo);
 
-            message.getChannel()
+            author.getPrivateChannel()
                     .flatMap(channel -> channel.createEmbed(embedCreateSpec -> {
                         embedCreateSpec.setColor(this.provider.getEmbedColor());
                         embedCreateSpec.setAuthor(author.getUsername(), "https://mine.ly/" + username, author.getAvatarUrl());
                         embedCreateSpec.setThumbnail(String.format("https://minotar.net/helm/%s/100.png", username));
                         embedCreateSpec.setTitle(Translation.DISCORD_REGISTERED.get(username));
                         this.createFooter(bot, embedCreateSpec);
-                    })).subscribe();
+                    }))
+                    .then(message.delete())
+                    .subscribe();
         } else if (this.plugin.getDiscordConfirmationManager().hasRequestPending(author)) {
             message.getChannel()
                     .flatMap(channel -> channel.createEmbed(embedCreateSpec -> {
@@ -80,24 +83,28 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
             Player player = Bukkit.getPlayer(username);
             if (player == null) {
                 // Must be online
-                message.getChannel()
+                author.getPrivateChannel()
                         .flatMap(channel -> channel.createEmbed(embedCreateSpec -> {
                             embedCreateSpec.setColor(Color.RED);
                             embedCreateSpec.setAuthor(author.getUsername(), null, author.getAvatarUrl());
                             embedCreateSpec.setTitle(Translation.DISCORD_MUST_BE_ONLINE.get());
                             this.createFooter(bot, embedCreateSpec);
-                        })).subscribe();
+                        }))
+                        .then(message.delete())
+                        .subscribe();
             } else {
                 // is online, sent confirmation message
                 this.plugin.getDiscordConfirmationManager().awaitConfirmation(player, author);
-                message.getChannel()
+                author.getPrivateChannel()
                         .flatMap(channel -> channel.createEmbed(embedCreateSpec -> {
                             embedCreateSpec.setColor(this.getDiscordConfig().getEmbedColor());
                             embedCreateSpec.setAuthor(author.getUsername(), null, author.getAvatarUrl());
                             embedCreateSpec.setThumbnail(String.format("https://minotar.net/helm/%s/100.png", username));
                             embedCreateSpec.setTitle(Translation.DISCORD_CONFIRMATION_SENT.get(username));
                             this.createFooter(bot, embedCreateSpec);
-                        })).subscribe();
+                        }))
+                        .then(message.delete())
+                        .subscribe();
             }
         }
     }
