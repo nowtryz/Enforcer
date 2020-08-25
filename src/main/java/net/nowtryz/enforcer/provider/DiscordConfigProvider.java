@@ -47,7 +47,7 @@ public final class DiscordConfigProvider {
         this.embedColor = new Color(section.getInt("embed-color", 14528782));
         this.doesUpdatePresence = section.getBoolean("presence", true);
         this.confirmationRequired = section.getBoolean("confirmation.required", false);
-        this.confirmationTimeout = this.extractTimeout(section.getLong("confirmation.timeout", 120));
+        this.confirmationTimeout = this.extractTimeout(section.getLong("confirmation.timeout", 120)) * 20;
 
         this.roleToGroup = this.parseDownSync(section.getConfigurationSection("synchronisations.down"));
         this.groupToRole = this.parseUpSync(section.getConfigurationSection("synchronisations.up"));
