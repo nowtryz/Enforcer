@@ -5,6 +5,7 @@ import net.milkbowl.vault.permission.Permission;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.i18n.Translation;
 import net.nowtryz.enforcer.listeners.FirewallListener;
+import net.nowtryz.enforcer.listeners.LuckPermsListener;
 import net.nowtryz.enforcer.manager.DiscordConfirmationManager;
 import net.nowtryz.enforcer.storage.flatfile.FilePlayersStorage;
 import net.nowtryz.enforcer.storage.PlayersStorage;
@@ -48,10 +49,16 @@ public final class Enforcer extends JavaPlugin {
 
         // Bots
         if (this.provider.discord.isEnabled()) Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-            this.getLogger().info("Starting discord bot");
-            this.discordConfirmationManager = new DiscordConfirmationManager(this);
-            this.discordBot = new DiscordBot(this);
-            this.discordBot.block();
+            if (this.provider.discord.getToken() == null) {
+                this.getLogger().warning("Skipping discord bot: token is not set");
+            } else if (this.provider.discord.getGuild().asLong() == 0) {
+                this.getLogger().warning("Skipping discord bot: guild is not set");
+            } else {
+                this.getLogger().info("Starting discord bot");
+                this.discordConfirmationManager = new DiscordConfirmationManager(this);
+                this.discordBot = new DiscordBot(this);
+                this.discordBot.block();
+            }
         });
         if (this.provider.twitch.isEnabled()) Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             this.getLogger().info("Starting twitch bot");
@@ -73,6 +80,12 @@ public final class Enforcer extends JavaPlugin {
         if (!this.getServer().getOnlineMode() && this.provider.isFirewallEnabled()) {
             this.getLogger().info("Enabling firewall");
             Bukkit.getPluginManager().registerEvents(new FirewallListener(this), this);
+        }
+
+        // Group change listener
+        if (Bukkit.getPluginManager().getPlugin("LuckPerms") != null) {
+            Bukkit.getPluginManager().registerEvents(new LuckPermsListener(this), this);
+            this.getLogger().info("LuckPerms listener hooked");
         }
 
         // enabled

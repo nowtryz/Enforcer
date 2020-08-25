@@ -10,9 +10,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
 @Getter
@@ -66,12 +66,14 @@ public final class DiscordConfigProvider {
     }
 
     private Map<Snowflake, String> parseDownSync(ConfigurationSection downSection) {
+        if (downSection == null) return new HashMap<>();
         // TODO catch number exception
         return BiStream.from(downSection.getKeys(false), Snowflake::of, downSection::getString)
                 .toMap();
     }
 
     private Map<String, Snowflake> parseUpSync(ConfigurationSection upSection) {
+        if (upSection == null) return new HashMap<>();
         // TODO catch number exception
         return BiStream.from(upSection.getKeys(false), Function.identity(), Function.identity())
                 .mapValues(s -> Snowflake.of(upSection.getString(s)))

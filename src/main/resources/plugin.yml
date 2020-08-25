@@ -5,10 +5,9 @@ author: "Nowtryz"
 website: "http://nowtryz.net"
 
 main: "net.nowtryz.enforcer.Enforcer"
-api-version: "1.13"
-depend:
-  - LuckPerms
-  - Vault
+# api-version: "1.13"
+depend: [Vault]
+softdepend: [LuckPerms]
 
 prefix: "Enforcer"
 

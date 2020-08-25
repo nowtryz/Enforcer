@@ -120,10 +120,9 @@ public class DiscordBot extends AbstractDiscordBot {
         );
     }
 
-    public void publishGroups(PlayerInfo playerInfo, Player player) {
+    public void publishGroups(PlayerInfo playerInfo, OfflinePlayer player) {
         Permission vaultPermission = this.getVaultPermission();
-        this.getLogger().info("player groups: " + Arrays.toString(vaultPermission.getPlayerGroups(player)));
-        List<Snowflake> rolesToAdd = Stream.of(vaultPermission.getPlayerGroups(player))
+        List<Snowflake> rolesToAdd = Stream.of(vaultPermission.getPlayerGroups(null, player))
                 .map(GroupUtil::parse)
                 .map(this.getDiscordConfig()::getRoleForGroup)
                 .filter(Optional::isPresent)
@@ -134,9 +133,6 @@ public class DiscordBot extends AbstractDiscordBot {
                 .getMemberById(this.getDiscordConfig().getGuild(), discordId)
                 .subscribe(member -> {
                     Set<Snowflake> roleIds = member.getRoleIds();
-
-                    this.getLogger().info("roles to add: " + rolesToAdd);
-                    this.getLogger().info(player.getName() + "'s roles: " + roleIds);
 
                     // Add roles
                     rolesToAdd.stream()
