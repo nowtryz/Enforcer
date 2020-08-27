@@ -47,11 +47,15 @@ discord:
     # from discord role to minecraft group
     down:
       # role id: "group name"
+      # Ex:
+      #746813124304175104: "enforcer"
     # from minecraft group to discord role
     # Please, replace '.' by '-' to void yaml parse errors
     # On luck perms use the display name because... https://github.com/lucko/LuckPerms/issues/2261
     up:
       # group name: role id
+      # Ex:
+      #"Sgt-at Arms": 746813224170684477
 
 
 

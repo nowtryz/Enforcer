@@ -42,11 +42,22 @@ public class DiscordBot extends AbstractDiscordBot {
         });
 
         client.getEventDispatcher().on(MemberUpdateEvent.class)
-                .filter(event -> event.getGuildId().equals(this.getDiscordConfig().getGuild()))
-                .map(MemberUpdateEvent::getMemberId)
-                .map(this.plugin.getPlayersManager()::getPlayerFromDiscord)
-                .flatMap(Mono::justOrEmpty)
-                .subscribe(this::grabRole);
+            .filter(event -> event.getGuildId().equals(this.getDiscordConfig().getGuild()))
+            .subscribe(this::onMemberUpdate);
+    }
+
+    private void onMemberUpdate(MemberUpdateEvent event) {
+        this.plugin.getPlayersManager()
+            .getPlayerFromDiscord(event.getMemberId())
+            .ifPresent(playerInfo -> this.updatePlayerGroups(
+                playerInfo,
+                event.getCurrentRoles()
+                    .stream()
+                    .map(this.getDiscordConfig()::getGroupForRole)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList())
+            ));
     }
 
     @EventHandler(priority = EventPriority.LOW)
