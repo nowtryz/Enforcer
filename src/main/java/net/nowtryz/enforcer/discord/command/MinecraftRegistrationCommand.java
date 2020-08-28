@@ -68,6 +68,14 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
                         embedCreateSpec.setTitle(Translation.DISCORD_REGISTERED.get(username));
                         this.createFooter(bot, embedCreateSpec);
                     })).subscribe();
+        } else if (this.plugin.getDiscordConfirmationManager().hasRequestPending(author)) {
+            message.getChannel()
+                    .flatMap(channel -> channel.createEmbed(embedCreateSpec -> {
+                        embedCreateSpec.setColor(Color.RED);
+                        embedCreateSpec.setAuthor(author.getUsername(), null, author.getAvatarUrl());
+                        embedCreateSpec.setTitle(Translation.DISCORD_ALREADY_CONFIRMING.get());
+                        this.createFooter(bot, embedCreateSpec);
+                    })).subscribe();
         } else {
             Player player = Bukkit.getPlayer(username);
             if (player == null) {

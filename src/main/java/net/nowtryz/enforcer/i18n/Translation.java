@@ -34,6 +34,7 @@ public enum Translation {
     DISCORD_PRESENCE_TPS("discord.presence.tps", "Minecraft | TPS : %.2f"),
     PRESENCE_ONLINE("discord.presence.online", "Minecraft | %d / %d joueurs"),
     DISCORD_READY("discord.ready", ""),
+    DISCORD_ALREADY_CONFIRMING("discord.already-confirming", ":x: You already have an in-game confirmation pending"),
     DISCORD_IP_ALLOWED("discord.new-ip-allowed", ""),
     DISCORD_LOGGED("discord.logged-to", "Approved demand for *%s*! Hurry hup, login to the server."),
     DISCORD_MENTIONED("discord.bot-mentioned", "Hey %s! My prefix is \"%c\""),

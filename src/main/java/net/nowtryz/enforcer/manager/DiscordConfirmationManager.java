@@ -1,7 +1,8 @@
 package net.nowtryz.enforcer.manager;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.util.Snowflake;
 import lombok.Getter;
 import lombok.NonNull;
 import net.md_5.bungee.api.chat.*;
@@ -12,14 +13,11 @@ import net.nowtryz.enforcer.storage.PlayerInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class DiscordConfirmationManager implements PluginHolder, BiConsumer<Player, UUID> {
-    private Map<UUID, User> confirmationsPending = new HashMap<>();
+    private final BiMap<UUID, User> confirmationsPending = HashBiMap.create();
     private @Getter final Enforcer plugin;
 
     public DiscordConfirmationManager(Enforcer plugin) {
@@ -28,6 +26,10 @@ public class DiscordConfirmationManager implements PluginHolder, BiConsumer<Play
 
     public boolean hasRequestPending(UUID request) {
         return this.confirmationsPending.containsKey(request);
+    }
+
+    public boolean hasRequestPending(User requester) {
+        return this.confirmationsPending.inverse().containsKey(requester);
     }
 
     @Override
@@ -80,7 +82,7 @@ public class DiscordConfirmationManager implements PluginHolder, BiConsumer<Play
         Translation.DISCORD_CONFIRMATION_FOOTER.send(player);
         Bukkit.getScheduler().runTaskLaterAsynchronously(
                 this.plugin,
-                () -> this.confirmationsPending.remove(requestId),
+                () -> this.confirmationsPending.remove(requestId, discordUser),
                 this.getDiscordConfig().getConfirmationTimeout()
         );
     }

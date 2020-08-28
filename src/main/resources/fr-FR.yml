@@ -19,6 +19,7 @@ discord:
   bot-mentioned: "Hey %s ! Mon prefix est `%c`"
   linked: "§7Ton compte a été associé à §6§l%s#%s§r§7 avec succès !"
   must-be-online: "Tu dois être connecté au serveur pour lier ton compte discord"
+  already-confirming: ":x: Tu as déjà une confirmation en attente en jeu qui t'attend !"
   already-associated: ":x: *%s* est déjà associé à %s !"
   missing-args: ":x: Arguments manquants"
   footer: "Faites `%s` pour la liste des commandes"
