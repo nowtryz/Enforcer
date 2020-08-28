@@ -28,7 +28,9 @@ public class InfoCommand extends AbstractDiscordCommand {
 
     @Override
     public void execute(User bot, MessageCreateEvent event, String[] args) {
-        event.getMessage().getChannel()
+        (event.getGuildId().isPresent() ? event.getMessage().delete() : Mono.empty())
+                .then(Mono.justOrEmpty(event.getMessage().getAuthor()))
+                .flatMap(User::getPrivateChannel)
                 .flatMap(this.sendInfo)
                 .subscribe();
     }

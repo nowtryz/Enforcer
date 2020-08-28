@@ -42,7 +42,7 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
 
         client.getEventDispatcher().on(ReadyEvent.class).subscribe(this::onReady);
         client.getEventDispatcher().on(MessageCreateEvent.class)
-                .filter(e -> e.getGuildId().map(id -> id.equals(this.getDiscordConfig().getGuild())).orElse(false))
+                .filter(e -> e.getGuildId().map(id -> id.equals(this.getDiscordConfig().getGuild())).orElse(true))
                 .filter(e -> e.getMessage().getAuthor().map(user -> !user.isBot()).orElse(false)
                         && e.getMessage().getContent().isPresent())
                 .subscribe(this::onMessage);
