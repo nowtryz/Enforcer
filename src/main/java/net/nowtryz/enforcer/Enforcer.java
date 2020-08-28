@@ -2,6 +2,7 @@ package net.nowtryz.enforcer;
 
 import lombok.Getter;
 import net.milkbowl.vault.permission.Permission;
+import net.nowtryz.enforcer.command.EnforcerCommand;
 import net.nowtryz.enforcer.discord.DiscordBot;
 import net.nowtryz.enforcer.i18n.Translation;
 import net.nowtryz.enforcer.listeners.FirewallListener;
@@ -14,6 +15,7 @@ import net.nowtryz.enforcer.twitch.TwitchBot;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -88,6 +90,9 @@ public final class Enforcer extends JavaPlugin {
             this.getLogger().info("LuckPerms listener hooked");
         }
 
+        // Enforcer command
+        new EnforcerCommand(this, this.getCommand("enforcer"));
+
         // enabled
         this.getLogger().info(Translation.LOADED.get(this.provider.getOwner()));
         this.enableLatch.countDown();
@@ -105,50 +110,52 @@ public final class Enforcer extends JavaPlugin {
         this.playersManager = null;
     }
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length == 0) {
-            Translation.HELP.send(sender);
-            return true;
-        }
-
-        switch (args[0].toLowerCase()) {
-            case "accept":
-                if (!(sender instanceof Player)) return true;
-                if (args.length != 2) return true;
-                UUID request = UUID.fromString(args[1]);
-
-                if (this.discordConfirmationManager.hasRequestPending(request)) {
-                    this.discordConfirmationManager.accept((Player) sender, request);
-                } else Translation.DISCORD_CONFIRMATION_EXPIRED.send(sender);
-
-                return true;
-            case "refuse":
-                if (!(sender instanceof Player)) return true;
-                if (args.length != 2) return true;
-                UUID refusedRequest = UUID.fromString(args[1]);
-                if (this.discordConfirmationManager.hasRequestPending(refusedRequest)) {
-                    this.discordConfirmationManager.refuse((Player) sender, refusedRequest);
-                } else Translation.DISCORD_CONFIRMATION_EXPIRED.send(sender);
-                return true;
-            case "reload":
-                if (label.equals("enforcer") && sender.hasPermission("enforcer.reload")) {
-                    Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-                        this.onDisable();
-                        this.reloadConfig();
-                        this.onEnable();
-                    });
-                    return true;
-                }
-                break;
-            case "clear":
-                Bukkit.getScheduler().runTaskAsynchronously(this, this.playersManager::clear);
-                Translation.CLEARED.send(sender);
-                return true;
-        }
-
-        return false;
-    }
+//    @Override
+//    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+//        if (args.length == 0) {
+//            Translation.HELP.send(sender);
+//            return true;
+//        }
+//
+//        switch (args[0].toLowerCase()) {
+//            case "accept":
+//                if (!(sender instanceof Player)) return false;
+//                if (args.length != 2) return false;
+//                UUID request = UUID.fromString(args[1]);
+//
+//                if (this.discordConfirmationManager.hasRequestPending(request)) {
+//                    this.discordConfirmationManager.accept((Player) sender, request);
+//                } else Translation.DISCORD_CONFIRMATION_EXPIRED.send(sender);
+//
+//                return true;
+//            case "refuse":
+//                if (!(sender instanceof Player)) return false;
+//                if (args.length != 2) return false;
+//                UUID refusedRequest = UUID.fromString(args[1]);
+//                if (this.discordConfirmationManager.hasRequestPending(refusedRequest)) {
+//                    this.discordConfirmationManager.refuse((Player) sender, refusedRequest);
+//                } else Translation.DISCORD_CONFIRMATION_EXPIRED.send(sender);
+//                return true;
+//            case "reload":
+//                if (sender.hasPermission("enforcer.reload")) {
+//                    Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+//                        this.onDisable();
+//                        this.reloadConfig();
+//                        this.onEnable();
+//                    });
+//                    return true;
+//                }
+//                break;
+//            case "clear":
+//                if (sender.hasPermission("enforcer.reset")) {
+//                    Bukkit.getScheduler().runTaskAsynchronously(this, this.playersManager::clear);
+//                    Translation.CLEARED.send(sender);
+//                }
+//                return true;
+//        }
+//
+//        return false;
+//    }
 
     /**
      * Saves the raw contents of any resource embedded with a plugin's .jar file assuming it can be found using

@@ -14,14 +14,12 @@ import net.nowtryz.enforcer.i18n.Translation;
 import net.nowtryz.enforcer.storage.PlayerInfo;
 import net.nowtryz.enforcer.util.GroupUtil;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

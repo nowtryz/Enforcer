@@ -5,7 +5,8 @@ help: |
   §9Aide §dEnforcer §9: /enforcer <commande>
   §7> §9reload §7 : recharge le plugin et relance tous les bots
   §7> §9clear §7  : supprime les données de tous les joueurs
-cleared: "§ddEnforcer : §7Toutes les données ont été effacées"
+cleared: "§dEnforcer : §7Toutes les données ont été effacées"
+not.player: "§cVous devez être en jeux pour exécuter cette commande!"
 discord:
   presence:
     legacy: "Minecraft | TPS : %1$.2f | %2$d / %3$d"

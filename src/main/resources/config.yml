@@ -16,9 +16,6 @@ firewall:
 
 
 # use discord bot to sync Discord highest role with server groups
-# Note: "My Super Role" become "my-super-role", use display names to
-#       change the way the group is displayed in your permission
-#       plugin.
 discord:
   # Launch the bot on plugin startup
   enabled: false
@@ -26,7 +23,7 @@ discord:
   # Then paste its bot token here
   token:
   # Guild id (Server Settings > Widget > Server ID)
-  # The bot will only listen messages and role updates from this server
+  # The bot will listen messages and role updates only from this server
   server:
   # command prefix, change it if it interfere with another bot
   prefix: "!"
@@ -37,7 +34,7 @@ discord:
 
   confirmation:
     # Ask confirmation to the player to ensure authenticity
-    required: false
+    required: true
     # Time in seconds before confirmations are cancelled
     timeout: 120
 

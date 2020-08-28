@@ -23,6 +23,7 @@ import static org.apache.commons.lang3.StringUtils.LF;
 public enum Translation {
     LOADED("loaded", "Hello %s! Enforcer plugin enabled!"),
     USING_PERM_SYSTEM("using-perms", "Using %s for group management"),
+    NOT_PLAYER("not.player", "Only players can execute this command"),
     ADDED_TO_GROUP("group-added", "You have been added to the group %s."),
     HELP("help", "Enforcer help: /enforcer <command>\n" +
             "> reload: reload the plugin and restart all bots\n" +

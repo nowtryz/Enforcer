@@ -39,7 +39,7 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
 
         if (args.length != 2) {
             message.getChannel()
-                    .map(channel -> this.sendMissingArgs(bot, this.getUsage(), channel))
+                    .flatMap(channel -> this.sendMissingArgs(bot, this.getUsage(), channel))
                     .subscribe();
             return;
         }
@@ -84,7 +84,7 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
                 this.plugin.getDiscordConfirmationManager().awaitConfirmation(player, author);
                 message.getChannel()
                         .flatMap(channel -> channel.createEmbed(embedCreateSpec -> {
-                            embedCreateSpec.setColor(Color.RED);
+                            embedCreateSpec.setColor(this.getDiscordConfig().getEmbedColor());
                             embedCreateSpec.setAuthor(author.getUsername(), null, author.getAvatarUrl());
                             embedCreateSpec.setThumbnail(String.format("https://minotar.net/helm/%s/100.png", username));
                             embedCreateSpec.setTitle(Translation.DISCORD_CONFIRMATION_SENT.get(username));

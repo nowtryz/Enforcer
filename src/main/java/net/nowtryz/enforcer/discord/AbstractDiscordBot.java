@@ -93,8 +93,8 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
 
         String[] args = message.getContent().orElse("").split(" ");
         if (args.length == 0) return;
-        if (args[0].length() <= 2) return;
         if (args[0].charAt(0) != this.getDiscordConfig().getPrefix()) return;
+        if (args[0].length() <= 2) return;
         String command = args[0].substring(1);
 
         Optional.ofNullable(this.commandMap.get(command))
