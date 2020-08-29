@@ -30,7 +30,7 @@ discord:
   confirmation:
     header: |-
       &m                                                                      &r
-      &8&l» &r&7Es-tu bien le détentaeur du compte dicord &r&6&l%s#%s&r&7 ?
+      &8&l» &r&7Es-tu bien le détenteur du compte dicord &r&6&l%s#%s&r&7 ?
     footer: |-
       &m                                                                      &r
     accept: "&l&a[OUI]"

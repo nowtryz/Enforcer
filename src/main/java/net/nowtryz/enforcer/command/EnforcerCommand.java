@@ -2,6 +2,7 @@ package net.nowtryz.enforcer.command;
 
 import lombok.NonNull;
 import net.nowtryz.enforcer.Enforcer;
+import net.nowtryz.enforcer.i18n.Translation;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
@@ -30,7 +31,10 @@ public class EnforcerCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
-        if (args.length == 0) return false;
+        if (args.length == 0) {
+            Translation.HELP.send(sender);
+            return true;
+        }
 
         Command children = this.commandMap.get(args[0]);
         if (children == null) return false;
