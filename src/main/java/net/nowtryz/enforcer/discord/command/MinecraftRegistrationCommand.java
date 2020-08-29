@@ -36,14 +36,7 @@ public class MinecraftRegistrationCommand extends AbstractDiscordCommand impleme
     }
 
     @Override
-    public void execute(User bot, MessageCreateEvent event, String[] args) {
-        Message message = event.getMessage();
-        Mono.justOrEmpty(message.getAuthor())
-                .zipWhen(u -> message.getChannel(), (author, channel) -> this.registerUser(channel, bot, author, args))
-                .subscribe();
-    }
-
-    private Mono<Message> registerUser(MessageChannel channel, User bot, User author, String[] args) {
+    public Mono<Message> execute(MessageChannel channel, User bot, User author, MessageCreateEvent event, String[] args) {
         if (args.length != 2) return this.sendMissingArgs(bot, this.getUsage(), channel);
 
         String username = args[1];

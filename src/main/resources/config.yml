@@ -32,11 +32,23 @@ discord:
   # Update bot's presence with TPS and player count (not recommended on bungeecord-like networks)
   presence: true
 
+  # Use confirmation during link process
   confirmation:
     # Ask confirmation to the player to ensure authenticity
     required: true
     # Time in seconds before confirmations are cancelled
     timeout: 120
+
+  message:
+    # Use private messages
+    # If enabled, users can execute commands by sending private messages to the bot and any command sent to the discord
+    # server will be answered in the user's private messages.
+    private: false
+    # Delete commands sent by users.
+    # Messages interpreted as the commands ("!mc", etc...) will be delete if sent to the discord server. This avoid
+    # Spam in textual channels, works better if used with private messages. Commands sent as private messages won't
+    # be deleted though.
+    delete: false
 
 
   # Map groups between discord and Minecraft

@@ -30,17 +30,10 @@ public class AllowIpCommand extends AbstractDiscordCommand implements UseFooterC
     }
 
     @Override
-    public void execute(User bot, MessageCreateEvent event, String[] args) {
-        Message message = event.getMessage();
-        message.getAuthor().ifPresent(author -> performAction(bot, author, message));
-    }
-
-    private void performAction(User bot, User author, Message message) {
-        message.getChannel()
-                .map(channel -> this.getPlayersManager().getPlayerFromDiscord(author.getId())
-                        .map(info -> this.allowNewIp(info, channel, bot, author))
-                        .orElseGet(() -> this.sendError(bot, author, channel))
-                ).subscribe();
+    public Mono<Message> execute(MessageChannel channel, User bot, User author, MessageCreateEvent event, String[] args) {
+        return this.getPlayersManager().getPlayerFromDiscord(author.getId())
+                .map(info -> this.allowNewIp(info, channel, bot, author))
+                .orElseGet(() -> this.sendError(bot, author, channel));
     }
 
     private Mono<Message> allowNewIp(PlayerInfo playerInfo, MessageChannel channel, User bot, User author) {

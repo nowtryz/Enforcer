@@ -27,9 +27,7 @@ public class InfoCommand extends AbstractDiscordCommand {
     }
 
     @Override
-    public void execute(User bot, MessageCreateEvent event, String[] args) {
-        event.getMessage().getChannel()
-                .flatMap(this.sendInfo)
-                .subscribe();
+    public Mono<Message> execute(MessageChannel channel, User bot, User author, MessageCreateEvent event, String[] args) {
+        return this.sendInfo.apply(channel);
     }
 }

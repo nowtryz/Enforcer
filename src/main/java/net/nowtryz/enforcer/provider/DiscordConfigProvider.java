@@ -24,11 +24,11 @@ public final class DiscordConfigProvider {
     private final Color embedColor;
     private final boolean enabled;
     private final String token;
-    @Accessors(fluent = true)
-    private final boolean doesUpdatePresence;
+    private final @Accessors(fluent = true) boolean doesUpdatePresence;
     private final Map<Snowflake, String> roleToGroup;
     private final Map<String, Snowflake> groupToRole;
-    private final boolean confirmationRequired;
+    private final boolean confirmationRequired, privateMessages;
+    private final @Accessors(fluent = true) boolean doesDeleteCommands;
 
 
     DiscordConfigProvider(@Nullable ConfigurationSection section) {
@@ -48,6 +48,8 @@ public final class DiscordConfigProvider {
         this.doesUpdatePresence = section.getBoolean("presence", true);
         this.confirmationRequired = section.getBoolean("confirmation.required", false);
         this.confirmationTimeout = this.extractTimeout(section.getLong("confirmation.timeout", 120)) * 20;
+        this.privateMessages = section.getBoolean("message.private", false);
+        this.doesDeleteCommands = section.getBoolean("message.delete", false);
 
         this.roleToGroup = this.parseDownSync(section.getConfigurationSection("synchronisations.down"));
         this.groupToRole = this.parseUpSync(section.getConfigurationSection("synchronisations.up"));

@@ -42,10 +42,13 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
 
         client.getEventDispatcher().on(ReadyEvent.class).subscribe(this::onReady);
         client.getEventDispatcher().on(MessageCreateEvent.class)
-                .filter(e -> e.getGuildId().map(id -> id.equals(this.getDiscordConfig().getGuild())).orElse(false))
+                .filter(e -> e.getGuildId()
+                        .map(id -> id.equals(this.getDiscordConfig().getGuild()))
+                        .orElse(this.getDiscordConfig().isPrivateMessages()))
                 .filter(e -> e.getMessage().getAuthor().map(user -> !user.isBot()).orElse(false)
                         && e.getMessage().getContent().isPresent())
-                .subscribe(this::onMessage);
+                .flatMap(this::onMessage)
+                .subscribe();
     }
 
     public final void block() {
@@ -76,7 +79,7 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
                 .subscribe(unused -> Bukkit.getScheduler().runTask(this.plugin, this::register));
     }
 
-    public final void onMessage(MessageCreateEvent event) {
+    public final Flux<?> onMessage(MessageCreateEvent event) {
         Message message = event.getMessage();
 
         if (message.getContent().orElse("").matches(".*8=+D.*")) {
@@ -87,32 +90,36 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
         }
 
         if (isBotMentioned(message)) {
-            this.onBotMention(message);
-            return;
+            return this.onBotMention(message);
         }
 
         String[] args = message.getContent().orElse("").split(" ");
-        if (args.length == 0) return;
-        if (args[0].charAt(0) != this.getDiscordConfig().getPrefix()) return;
-        if (args[0].length() <= 2) return;
-        String command = args[0].substring(1);
+        if (args.length == 0 || args[0].charAt(0) != this.getDiscordConfig().getPrefix() || args[0].length() <= 2)
+            return Flux.empty();
 
-        Optional.ofNullable(this.commandMap.get(command))
+        Mono<Message> result = Optional.ofNullable(this.commandMap.get(args[0].substring(1)))
                 .filter(DiscordCommand::isEnabled)
-                .ifPresent(c -> c.execute(this.user, event, args));
+                .map(command -> message.getAuthor()
+                        .map(author ->
+                                (this.getDiscordConfig().isPrivateMessages() ? author.getPrivateChannel() : message.getChannel())
+                                        .flatMap(channel -> command.execute(channel, this.user, author, event, args)))
+                        .orElseGet(Mono::empty)
+                )
+                .orElseGet(Mono::empty);
+
+        return (this.getDiscordConfig().doesDeleteCommands() ? result.and(message.delete()) : result)
+                .flux();
     }
 
-    private void onBotMention(Message message) {
-        this.plugin.getLogger().info("mentioned");
-        message.getAuthor().ifPresent(author -> message.getChannel()
-                .flatMapMany(channel -> Flux.merge(
+    private Flux<Message> onBotMention(Message message) {
+        return message.getAuthor()
+                .map(author -> message.getChannel().flatMapMany(channel -> Flux.merge(
                         channel.createMessage(Translation.DISCORD_MENTIONED.get(
                             author.getMention(),
                             this.getDiscordConfig().getPrefix()
                         )),
                         this.sendInfo(channel)
-                )).subscribe()
-        );
+                ))).orElseGet(Flux::empty);
     }
 
     protected void updatePresence() {
