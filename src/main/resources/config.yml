@@ -39,6 +39,7 @@ discord:
     # Time in seconds before confirmations are cancelled
     timeout: 120
 
+  # Settings related to messages sent from and to the bot trough discord
   message:
     # Use private messages
     # If enabled, users can execute commands by sending private messages to the bot and any command sent to the discord

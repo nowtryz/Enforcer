@@ -51,8 +51,8 @@ public abstract class AbstractDiscordBot implements Listener, PluginHolder {
                 .subscribe();
     }
 
-    public final void block() {
-        this.client.login().block();
+    public final void login() {
+        this.client.login().subscribe();
     }
 
     public final void register() {
